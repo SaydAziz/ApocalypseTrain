@@ -2,6 +2,8 @@
 
 
 #include "PlayerCharacter.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -32,3 +34,19 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+
+void APlayerCharacter::DoMove(const FInputActionValue& Value)
+{
+}
+
+void APlayerCharacter::DoLook(const FInputActionValue& Value)
+{
+}
+
+void APlayerCharacter::DoDash(const FInputActionValue& Value)
+{
+}
+
+void APlayerCharacter::DoInteract(const FInputActionValue& Value)
+{
+}
