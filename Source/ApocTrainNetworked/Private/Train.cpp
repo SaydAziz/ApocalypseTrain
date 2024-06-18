@@ -2,6 +2,7 @@
 
 
 #include "Train.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ATrain::ATrain()
@@ -20,7 +21,8 @@ void ATrain::StartTrain()
 void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 
@@ -104,6 +106,12 @@ bool ATrain::IsTrainStopped()
 		return true;
 	}
 	return false;
+}
+
+void ATrain::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	//DOREPLIFETIME(ATrain, currentLocation)
 }
 
 bool ATrain::IsGameOverCountingDown()
