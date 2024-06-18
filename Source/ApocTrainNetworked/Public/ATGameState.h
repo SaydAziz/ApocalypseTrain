@@ -14,4 +14,11 @@ class APOCTRAINNETWORKED_API AATGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	APlayerManager* GetPlayerManager();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class APlayerManager* playerManager;
 };

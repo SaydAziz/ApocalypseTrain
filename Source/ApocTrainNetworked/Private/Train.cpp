@@ -9,20 +9,21 @@ ATrain::ATrain()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 void ATrain::StartTrain()
 {
 	SetTrainState(ETrainState::accelerating);
+
 }
 
 // Called when the game starts or when spawned
 void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
-	SetReplicateMovement(true);
+
 }
 
 
@@ -31,8 +32,10 @@ void ATrain::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateSpeed(DeltaTime);
-	UpdateLocation(DeltaTime);
+	if (CanMove) {
+		UpdateSpeed(DeltaTime);
+		UpdateLocation(DeltaTime);
+	}
 }
 
 
