@@ -3,6 +3,7 @@
 
 #include "PlayerCharacter.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 
 // Sets default values
@@ -58,15 +59,23 @@ void APlayerCharacter::DoMove(const FInputActionValue& Value)
 
 	if (Controller && ((value.X != 0) || (value.Y != 0)))
 	{
-		FVector forwardDir = FVector(1, 0, 0);
-		FVector rightDir = FVector(0, 1, 0);
-		AddMovementInput(forwardDir, value.Y);
-		AddMovementInput(rightDir, value.X);
+		FVector ForwardDir = FVector(1, 0, 0);
+		FVector RightDir = FVector(0, 1, 0);
+		AddMovementInput(ForwardDir, value.Y);
+		AddMovementInput(RightDir, value.X);
 	}
 }
 
 void APlayerCharacter::DoLook(const FInputActionValue& Value)
 {
+	const FVector2D value = Value.Get<FVector2D>();
+	if (Controller)
+	{
+		FVector RotVector = FVector(-value.Y, value.X, 0);
+		FRotator RotDir = UKismetMathLibrary::MakeRotFromX(RotVector);
+		FRotator NewRotation = FMath::Lerp(GetControlRotation(), RotDir, 0.2f);
+		Controller->SetControlRotation(NewRotation);
+	}
 }
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
