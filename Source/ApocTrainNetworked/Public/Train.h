@@ -30,9 +30,13 @@ public:
 	FVector GetTrainLocation();
 	bool IsTrainStopped();
 
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 
 	bool isReversing;
+	UPROPERTY()
 	FVector currentLocation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ETrainState currentTrainState;
@@ -60,5 +64,6 @@ protected:
 	void NotifyTrainStart();
 	UFUNCTION(BlueprintImplementableEvent)
 	void NotifyTrainStop();
+
 
 };
