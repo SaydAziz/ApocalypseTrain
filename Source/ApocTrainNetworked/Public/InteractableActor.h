@@ -48,6 +48,8 @@ protected:
 
 	class APlayerManager* playerManager;
 
+	virtual bool ShouldUpdateOverlappingPlayers();
+
 	void UpdateOverlappingPlayers();
 
 	virtual void CheckForInteractPressed();

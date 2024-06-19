@@ -46,21 +46,18 @@ public:
 	void Server_OnPickedUp_Implementation(USceneComponent* carrier);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void Multi_OnPickedUp(USceneComponent* carrier);
-	void Multi_OnPickedUp_Implementation(USceneComponent* carrier);
+	void Multi_SetRenderDepth(bool renderdepth);
+	void Multi_SetRenderDepth_Implementation(bool renderdepth);
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DropObject(FVector directionToLaunch);
 	void Server_DropObject_Implementation(FVector directionToLaunch);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void Multi_DropObject(FVector directionToLaunch);
-	void Multi_DropObject_Implementation(FVector directionToLaunch);
 
 protected:
 
 	UPROPERTY(BlueprintReadOnly);
 	bool wasDropped;
 
-
+	virtual bool ShouldUpdateOverlappingPlayers() override;
 };

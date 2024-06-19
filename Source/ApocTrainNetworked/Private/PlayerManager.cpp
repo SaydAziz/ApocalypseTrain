@@ -32,3 +32,10 @@ void APlayerManager::Tick(float DeltaTime)
 	
 }
 
+int APlayerManager::RegisterPlayerWithManager(APlayerCharacter* joinedPlayer)
+{
+	int index = ActivePlayers.Add(joinedPlayer);
+	joinedPlayer->PlayerIndex = index;
+	return index;
+}
+

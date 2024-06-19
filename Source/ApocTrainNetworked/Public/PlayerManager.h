@@ -28,4 +28,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class APlayerCharacter*> ActivePlayers;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FColor> PlayerColors;
+
+	UFUNCTION(BlueprintCallable)
+
+	int RegisterPlayerWithManager(class APlayerCharacter* joinedPlayer);
+
 };
