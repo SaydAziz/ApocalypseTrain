@@ -5,20 +5,26 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "CarryableActor.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	SetReplicates(true);
+	SetReplicateMovement(true);
+	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
 }
+
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
 }
 
 // Called every frame
@@ -26,6 +32,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 // Called to bind functionality to input
@@ -47,11 +58,87 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
-		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::DoInteract);
+		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
+		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
 
 }
 
+bool APlayerCharacter::IsCarryingItem()
+{
+	return CarryingItem;
+}
+
+bool APlayerCharacter::IsFacingWall()
+{
+	FVector start = GetActorLocation();
+	FVector forward = carrySlot->GetComponentLocation() - GetActorLocation();
+	forward.Z = 0;
+	FVector end = start + (forward * 1.2);
+	FHitResult hit;
+	if (GetWorld()) {
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		QueryParams.AddIgnoredActor(carriedObject);
+		//QueryParams.AddIgnoredActor(CurrentWeapon);
+		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_WorldDynamic, QueryParams, FCollisionResponseParams());
+		/*if (actorHit && hit.GetActor()) {
+			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(hit.GetActor())) {
+				return false;
+			}
+			if (AObstacle* obstacle = Cast<AObstacle>(hit.GetActor())) {
+				return false;
+			}
+			return true;
+		}*/
+	}
+	return false;
+}
+
+void APlayerCharacter::Server_DropCarriedItem_Implementation()
+{
+	if (CarryingItem) {
+		if (carriedObject != NULL) {
+			float upwardForce = 0.5f;
+			if (IsFacingWall()) {
+				carriedObject->SetActorLocation(GetActorLocation());
+				carriedObject->Server_DropObject((characterMesh->GetForwardVector() * -1) * 0.2f * throwVelocity);
+			}
+			else {
+				carriedObject->Server_DropObject(((characterMesh->GetForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity);
+			}
+		}
+		CarryingItem = false;
+		//AttachWeapon();
+	}
+}
+
+void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToCarry)
+{
+	Multi_PickupItem(itemToCarry);
+}
+
+void APlayerCharacter::Multi_PickupItem_Implementation(ACarryableActor* itemToCarry)
+{
+	if (CarryingItem) {
+		return;
+	}
+	CarryingItem = true;
+	carriedObject = itemToCarry;
+	//HolsterWeapon();
+	itemToCarry->Server_OnPickedUp(carrySlot);
+	//ShootReleased();
+}
+
+void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
+{
+	Multi_OnInteract(interacted);
+}
+
+void APlayerCharacter::Multi_OnInteract_Implementation(bool interacted)
+{
+	Interacted = interacted;
+}
 
 void APlayerCharacter::DoMove(const FInputActionValue& Value)
 {
@@ -80,8 +167,16 @@ void APlayerCharacter::DoLook(const FInputActionValue& Value)
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
 {
+
 }
 
-void APlayerCharacter::DoInteract(const FInputActionValue& Value)
+void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 {
+	Server_OnInteract(true);
+	Server_DropCarriedItem();
+}
+
+void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
+{
+	Server_OnInteract(false);
 }

@@ -2,4 +2,10 @@
 
 
 #include "ATGameState.h"
+#include "PlayerManager.h"
+
+APlayerManager* AATGameState::GetPlayerManager()
+{
+	return playerManager;
+}
 

@@ -46,7 +46,7 @@ protected:
 	float AccelerationRate;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float DecelerationRate;
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	bool CanMove;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	float currentTrainSpeed;

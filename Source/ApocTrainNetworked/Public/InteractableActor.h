@@ -6,21 +6,56 @@
 #include "GameFramework/Actor.h"
 #include "InteractableActor.generated.h"
 
+class APlayerCharacter;
+
 UCLASS()
 class APOCTRAINNETWORKED_API AInteractableActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+
 	// Sets default values for this actor's properties
 	AInteractableActor();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(Replicated)
+	TArray<APlayerCharacter*> overlappingPlayers;
+	UPROPERTY(Replicated)
+	TArray<APlayerCharacter*> overlappingPlayersToRemove;
+
+	UPROPERTY(EditAnywhere, Category="Mesh")
+	class USphereComponent* trigger;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_PlayersOverlapping();
+	virtual void Multi_PlayersOverlapping_Implementation();
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_NoPlayersOverlapping();
+	virtual void Multi_NoPlayersOverlapping_Implementation();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	bool wasInteracted;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* MeshToHighlight;
+
+	class APlayerManager* playerManager;
+
+	void UpdateOverlappingPlayers();
+
+	virtual void CheckForInteractPressed();
+
+	virtual void OnInteract(APlayerCharacter* player);
+
+	virtual bool CurrentlyInteractable();
+
+	virtual bool CanPlayerInteract(APlayerCharacter* player);
 
 };
