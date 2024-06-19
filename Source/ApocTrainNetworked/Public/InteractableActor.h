@@ -30,27 +30,29 @@ public:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multi_PlayersOverlapping();
-	void Multi_PlayersOverlapping_Implementation();
+	virtual void Multi_PlayersOverlapping_Implementation();
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multi_NoPlayersOverlapping();
-	void Multi_NoPlayersOverlapping_Implementation();
+	virtual void Multi_NoPlayersOverlapping_Implementation();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void OnInteract(APlayerCharacter* player);
+	
 
 protected:
 
 	bool wasInteracted;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* MeshToHighlight;
+	class UStaticMeshComponent* MeshToHighlight;
 
 	class APlayerManager* playerManager;
 
 	void UpdateOverlappingPlayers();
 
 	virtual void CheckForInteractPressed();
+
+	virtual void OnInteract(APlayerCharacter* player);
 
 	virtual bool CurrentlyInteractable();
 

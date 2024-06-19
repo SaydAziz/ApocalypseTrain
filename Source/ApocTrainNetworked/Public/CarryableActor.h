@@ -22,19 +22,45 @@ class APOCTRAINNETWORKED_API ACarryableActor : public AInteractableActor
 	
 public:
 
+	virtual void BeginPlay() override;
+
 	ECarriedState carriedState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	APlayerCharacter* LastCarryingPlayer;
+	
+	UPrimitiveComponent* PhysicsComponent;
 
-	void DropObject(FVector directionToLaunch);
+	virtual void OnInteract(APlayerCharacter* player) override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnPickedUp(USceneComponent* carrier);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnDropped(FVector directionToLaunch);
 
 	virtual bool CurrentlyInteractable() override;
+
+
+	UFUNCTION()
+	void OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+	UFUNCTION(Server, Unreliable)
+	void Server_OnPickedUp(USceneComponent* carrier);
+	void Server_OnPickedUp_Implementation(USceneComponent* carrier);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_OnPickedUp(USceneComponent* carrier);
+	void Multi_OnPickedUp_Implementation(USceneComponent* carrier);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_DropObject(FVector directionToLaunch);
+	void Server_DropObject_Implementation(FVector directionToLaunch);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_DropObject(FVector directionToLaunch);
+	void Multi_DropObject_Implementation(FVector directionToLaunch);
+
+protected:
+
+	UPROPERTY(BlueprintReadOnly);
+	bool wasDropped;
+
 
 };

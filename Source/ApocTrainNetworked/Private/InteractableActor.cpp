@@ -16,7 +16,6 @@ AInteractableActor::AInteractableActor()
 	PrimaryActorTick.bCanEverTick = true;
 	SetReplicates(true);
 	SetReplicateMovement(true);
-	trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
 }
 
 // Called when the game starts or when spawned
@@ -24,16 +23,8 @@ void AInteractableActor::BeginPlay()
 {
 	Super::BeginPlay();
 	playerManager = GetWorld()->GetGameState<AATGameState>()->GetPlayerManager();
-	TSet<UActorComponent*> components = GetComponents();
-	for (UActorComponent* component : components) {
-		if (component->IsA(UStaticMeshComponent::StaticClass())) {
-			UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(component);
-			if (Mesh && Mesh->ComponentHasTag("MeshToHighlight"))
-			{
-				MeshToHighlight = Mesh;
-			}
-		}
-	}
+	trigger = FindComponentByTag<USphereComponent>(FName("Trigger"));
+	MeshToHighlight = FindComponentByTag<UStaticMeshComponent>(FName("MeshToHighlight"));
 }
 
 // Called every frame
@@ -55,9 +46,6 @@ void AInteractableActor::Tick(float DeltaTime)
 void AInteractableActor::UpdateOverlappingPlayers()
 {
 	if (playerManager == NULL) {
-		return;
-	}
-	if (false){//authority){
 		return;
 	}
 	for (APlayerCharacter* c : playerManager->ActivePlayers) {

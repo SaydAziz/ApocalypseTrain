@@ -33,15 +33,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* InteractAction;
 
+	class ACarryableActor* carriedObject;
+	class USceneComponent* carrySlot;
+	class USkeletalMeshComponent* characterMesh;
 //protected:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int PlayerIndex;
+
 protected:
 
-	class AInteractableActor* groundedInteractable;
+	UPROPERTY(BlueprintReadOnly)
+	bool CarryingItem;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float throwVelocity;
 
 	class USphereComponent* InteractionTrigger;
 	// Called when the game starts or when spawned
@@ -53,7 +62,8 @@ protected:
 
 	void DoDash(const FInputActionValue& Value);
 
-	void DoInteract(const FInputActionValue& Value);
+	void InteractPressed(const FInputActionValue& Value);
+
 	void InteractReleased(const FInputActionValue& Value);
 
 public:	
@@ -64,6 +74,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool IsCarryingItem();
+	bool IsFacingWall();
+
+	UFUNCTION(Server, Unreliable)
+	void Server_DropCarriedItem();
+	void Server_DropCarriedItem_Implementation();
+
+	UFUNCTION(Server, Unreliable)
+	void Server_PickupItem(class ACarryableActor* itemToCarry);
+	void Server_PickupItem_Implementation(class ACarryableActor* itemToCarry);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_PickupItem(class ACarryableActor* itemToCarry);
+	void Multi_PickupItem_Implementation(class ACarryableActor* itemToCarry);
+
 	UFUNCTION(Server, Reliable)
 	void Server_OnInteract(bool interacting);
 	void Server_OnInteract_Implementation(bool interacting);
@@ -72,9 +97,4 @@ public:
 	void Multi_OnInteract(bool interacting);
 	void Multi_OnInteract_Implementation(bool interacting);
 
-	UFUNCTION()
-	void OnInteractionTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnInteractionTriggerEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
