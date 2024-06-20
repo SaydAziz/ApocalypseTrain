@@ -32,7 +32,9 @@ void AInteractableActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Orange, FString::Printf(TEXT("Players: %d"), overlappingPlayers.Num()));
-	UpdateOverlappingPlayers();
+	if (ShouldUpdateOverlappingPlayers()) {
+		UpdateOverlappingPlayers();
+	}
 }
  
 //send Interacted to server
@@ -42,6 +44,11 @@ void AInteractableActor::Tick(float DeltaTime)
 //on interact - call interact on the ongrounditem 
 
 
+
+bool AInteractableActor::ShouldUpdateOverlappingPlayers()
+{
+	return true;
+}
 
 void AInteractableActor::UpdateOverlappingPlayers()
 {

@@ -115,11 +115,6 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 
 void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToCarry)
 {
-	Multi_PickupItem(itemToCarry);
-}
-
-void APlayerCharacter::Multi_PickupItem_Implementation(ACarryableActor* itemToCarry)
-{
 	if (CarryingItem) {
 		return;
 	}
@@ -130,12 +125,8 @@ void APlayerCharacter::Multi_PickupItem_Implementation(ACarryableActor* itemToCa
 	//ShootReleased();
 }
 
-void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
-{
-	Multi_OnInteract(interacted);
-}
 
-void APlayerCharacter::Multi_OnInteract_Implementation(bool interacted)
+void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
 {
 	Interacted = interacted;
 }

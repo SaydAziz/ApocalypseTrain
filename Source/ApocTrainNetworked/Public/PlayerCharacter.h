@@ -40,7 +40,7 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	int PlayerIndex;
 
 protected:
@@ -85,16 +85,8 @@ public:
 	void Server_PickupItem(class ACarryableActor* itemToCarry);
 	void Server_PickupItem_Implementation(class ACarryableActor* itemToCarry);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void Multi_PickupItem(class ACarryableActor* itemToCarry);
-	void Multi_PickupItem_Implementation(class ACarryableActor* itemToCarry);
-
 	UFUNCTION(Server, Reliable)
 	void Server_OnInteract(bool interacting);
 	void Server_OnInteract_Implementation(bool interacting);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multi_OnInteract(bool interacting);
-	void Multi_OnInteract_Implementation(bool interacting);
 
 };

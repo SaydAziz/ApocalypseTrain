@@ -30,33 +30,38 @@ bool ACarryableActor::CurrentlyInteractable()
 
 void ACarryableActor::Server_OnPickedUp_Implementation(USceneComponent* carrier)
 {
-	Multi_OnPickedUp(carrier);
-}
-
-void ACarryableActor::Multi_OnPickedUp_Implementation(USceneComponent* carrier)
-{
+	SetReplicateMovement(true);
+	SetReplicates(true);
 	if (carrier == NULL) {
 		return;
 	}
 	PhysicsComponent->SetSimulatePhysics(false);
 	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
-	PhysicsComponent->AttachToComponent(carrier, rules);
+	AttachToComponent(carrier, rules);
 	SetActorLocation(carrier->GetComponentLocation());
-	MeshToHighlight->SetRenderCustomDepth(false);
+	Multi_SetRenderDepth(false);
+}
+
+void ACarryableActor::Multi_SetRenderDepth_Implementation(bool renderdepth)
+{
+	MeshToHighlight->SetRenderCustomDepth(renderdepth);
 }
 
 void ACarryableActor::Server_DropObject_Implementation(FVector directionToLaunch)
-{
-	Multi_DropObject(directionToLaunch);
-}
-
-void ACarryableActor::Multi_DropObject_Implementation(FVector directionToLaunch)
 {
 	carriedState = ECarriedState::Dropped;
 	PhysicsComponent->SetSimulatePhysics(true);
 	PhysicsComponent->SetPhysicsLinearVelocity(FVector::Zero());
 	PhysicsComponent->AddImpulse(directionToLaunch);
 	wasDropped = true;
+}
+
+bool ACarryableActor::ShouldUpdateOverlappingPlayers()
+{
+	if (carriedState == ECarriedState::Carried) {
+		return false;
+	}
+	return true;
 }
 
 void ACarryableActor::OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

@@ -18,6 +18,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	APlayerManager* GetPlayerManager();
 
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class APlayerManager* playerManager;

@@ -3,6 +3,7 @@
 
 #include "ATGameState.h"
 #include "PlayerManager.h"
+#include "PlayerCharacter.h"
 
 APlayerManager* AATGameState::GetPlayerManager()
 {
