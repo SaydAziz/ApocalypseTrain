@@ -102,10 +102,10 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 			float upwardForce = 0.5f;
 			if (IsFacingWall()) {
 				carriedObject->SetActorLocation(GetActorLocation());
-				carriedObject->Server_DropObject((characterMesh->GetForwardVector() * -1) * 0.2f * throwVelocity);
+				carriedObject->Server_DropObject((this->GetActorForwardVector() * -1) * 0.2f * throwVelocity);
 			}
 			else {
-				carriedObject->Server_DropObject(((characterMesh->GetForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity);
+				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity);
 			}
 		}
 		CarryingItem = false;

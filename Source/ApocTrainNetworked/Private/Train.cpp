@@ -16,7 +16,6 @@ ATrain::ATrain()
 void ATrain::StartTrain()
 {
 	SetTrainState(ETrainState::accelerating);
-
 }
 
 // Called when the game starts or when spawned
@@ -83,7 +82,7 @@ void ATrain::UpdateSpeed(float deltaTime)
 void ATrain::UpdateLocation(float DeltaTime)
 {
 	currentLocation = GetActorLocation();
-	currentLocation += FVector(1, 0, 0) * currentTrainSpeed * DeltaTime;
+	currentLocation += FVector(0, 1, 0) * currentTrainSpeed * DeltaTime;
 	SetActorLocation(currentLocation, true);
 }
 
