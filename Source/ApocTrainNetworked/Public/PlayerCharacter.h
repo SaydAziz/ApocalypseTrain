@@ -7,7 +7,11 @@
 #include "InputActionValue.h"
 #include "PlayerCharacter.generated.h"
 
-
+UENUM()
+enum class EPlayerMovementState : uint8
+{
+	standing UMETA(DisplayName = "Standing"), walking UMETA(DisplayName = "Walking"), dashing UMETA(DisplayName = "Dashing")
+};
 
 UCLASS()
 class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter
@@ -41,14 +45,18 @@ public:
 	class USceneComponent* carrySlot;
 	class USkeletalMeshComponent* characterMesh;
 
-//protected:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
-
 	UPROPERTY(BlueprintReadOnly)
 	int PlayerIndex;
 
+
 protected:
+
+	//PLAYER STATE
+	EPlayerMovementState CurrentMovementState;
+
+	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
 
 	//INTERACT MECHANICS
 	UPROPERTY(BlueprintReadOnly)

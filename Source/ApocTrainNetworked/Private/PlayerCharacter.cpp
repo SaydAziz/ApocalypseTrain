@@ -19,6 +19,8 @@ APlayerCharacter::APlayerCharacter()
 	SetReplicateMovement(true);
 	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
 
+	CurrentMovementState = EPlayerMovementState::standing;
+
 	DashImpulseStrength = 2000.0f;
 	DashCooldown = 1.0f;
 	bCanDash = true;
@@ -34,7 +36,23 @@ void APlayerCharacter::BeginPlay()
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
+	
 	Super::Tick(DeltaTime);
+	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentState));
+
+	float CurrentSpeed = GetVelocity().Size();
+	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
+	{
+		SetPlayerMovementState(EPlayerMovementState::dashing);
+	}
+	else if (CurrentSpeed > 0)
+	{
+		SetPlayerMovementState(EPlayerMovementState::walking);
+	}
+	else 
+	{
+		SetPlayerMovementState(EPlayerMovementState::standing);
+	}
 
 }
 
@@ -178,6 +196,7 @@ void APlayerCharacter::DoDash(const FInputActionValue& Value)
 	}
 }
 
+
 void APlayerCharacter::ResetDash()
 {
 	bCanDash = true;
@@ -192,4 +211,16 @@ void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 {
 	Server_OnInteract(false);
+}
+
+void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)
+{
+	if (CurrentMovementState != NewMovementState)
+	{
+		CurrentMovementState = NewMovementState;
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentMovementState));
+
+		//Add transition logic here
+	}
+
 }
