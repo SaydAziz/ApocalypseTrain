@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "CarryableActor.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -17,8 +18,11 @@ APlayerCharacter::APlayerCharacter()
 	SetReplicates(true);
 	SetReplicateMovement(true);
 	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
-}
 
+	DashImpulseStrength = 2000.0f;
+	DashCooldown = 1.0f;
+	bCanDash = true;
+}
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
@@ -131,6 +135,9 @@ void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
 	Interacted = interacted;
 }
 
+
+
+
 void APlayerCharacter::DoMove(const FInputActionValue& Value)
 {
 	const FVector2D value = Value.Get<FVector2D>();
@@ -158,7 +165,22 @@ void APlayerCharacter::DoLook(const FInputActionValue& Value)
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
 {
+	if (bCanDash)
+	{
+		FVector DashDir = GetVelocity().GetSafeNormal();
+		FVector Impulse = DashDir * DashImpulseStrength;
 
+		GetCharacterMovement()->Launch(Impulse);
+
+		bCanDash = false;
+		GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &APlayerCharacter::ResetDash, DashCooldown, false);
+
+	}
+}
+
+void APlayerCharacter::ResetDash()
+{
+	bCanDash = true;
 }
 
 void APlayerCharacter::InteractPressed(const FInputActionValue& Value)

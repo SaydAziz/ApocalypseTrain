@@ -18,6 +18,9 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+
+
+	//INPUT CONTROLS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* DefaultMappingContext;
 
@@ -33,9 +36,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* InteractAction;
 
+	//INTERACTION MECHANICS
 	class ACarryableActor* carriedObject;
 	class USceneComponent* carrySlot;
 	class USkeletalMeshComponent* characterMesh;
+
 //protected:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
@@ -45,12 +50,23 @@ public:
 
 protected:
 
+	//INTERACT MECHANICS
 	UPROPERTY(BlueprintReadOnly)
 	bool CarryingItem;
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
+
+	//DASH MECHANICS
+	UPROPERTY(EditAnywhere, Category = Dash)
+	float DashImpulseStrength;
+	UPROPERTY(EditAnywhere, Category = Dash)
+	float DashCooldown;
+
+	bool bCanDash;
+	FTimerHandle DashCooldownTimerHandle;
+
+	void ResetDash();
+
 
 	class USphereComponent* InteractionTrigger;
 	// Called when the game starts or when spawned
