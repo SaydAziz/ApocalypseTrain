@@ -8,13 +8,15 @@
 
 
 UENUM()
-enum class ETrainState : uint8 {
-	stopped UMETA(DIsplayName = "Stopped"), accelerating UMETA(DIsplayName = "Accelerating"), decelerating UMETA(DIsplayName = "Decelerating")
+enum class ETrainState : uint8 
+{
+	stopped UMETA(DisplayName = "Stopped"), accelerating UMETA(DisplayName = "Accelerating"), decelerating UMETA(DisplayName = "Decelerating")
 };
 
 UENUM()
-enum class EFuelState : uint8 {
-	normal UMETA(DIsplayName = "Normal"), critical UMETA(DIsplayName = "Critical")
+enum class EFuelState : uint8 
+{
+	normal UMETA(DisplayName = "Normal"), critical UMETA(DisplayName = "Critical")
 };
 
 
