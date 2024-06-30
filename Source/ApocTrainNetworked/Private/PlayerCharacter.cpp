@@ -98,21 +98,17 @@ bool APlayerCharacter::IsFacingWall()
 	forward.Z = 0;
 	FVector end = start + (forward * 1.2);
 	FHitResult hit;
+
 	if (GetWorld()) {
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
 		QueryParams.AddIgnoredActor(carriedObject);
 		//QueryParams.AddIgnoredActor(CurrentWeapon);
 		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_WorldDynamic, QueryParams, FCollisionResponseParams());
-		/*if (actorHit && hit.GetActor()) {
-			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(hit.GetActor())) {
-				return false;
-			}
-			if (AObstacle* obstacle = Cast<AObstacle>(hit.GetActor())) {
-				return false;
-			}
+		if (actorHit && hit.GetActor()) 
+		{
 			return true;
-		}*/
+		}
 	}
 	return false;
 }
