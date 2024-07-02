@@ -3,7 +3,9 @@
 
 #include "PlayerManager.h"
 #include "PlayerCharacter.h"
+#include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"
+#include <Kismet/KismetMathLibrary.h>
 
 // Sets default values
 APlayerManager::APlayerManager()
@@ -39,3 +41,26 @@ int APlayerManager::RegisterPlayerWithManager(APlayerCharacter* joinedPlayer)
 	return index;
 }
 
+bool APlayerManager::IsOverlappingPlayer(UBoxComponent* box)
+{
+	for (int i = 0; i < ActivePlayers.Num(); i++) {
+		if (UKismetMathLibrary::IsPointInBox(ActivePlayers[i]->GetActorLocation(), box->GetComponentLocation(), box->GetScaledBoxExtent()))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool APlayerManager::IsOverlappingPlayerWithFuel(UBoxComponent* box)
+{
+	for (int i = 0; i < ActivePlayers.Num(); i++) {
+		if (UKismetMathLibrary::IsPointInBox(ActivePlayers[i]->GetActorLocation(), box->GetComponentLocation(), box->GetScaledBoxExtent()))
+		{
+			if (ActivePlayers[i]->IsCarryingItem()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}

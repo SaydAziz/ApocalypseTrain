@@ -22,10 +22,12 @@ void ACarryableActor::OnInteract(APlayerCharacter* player)
 
 bool ACarryableActor::CurrentlyInteractable()
 {
-	if (carriedState == ECarriedState::Idle) {
-		return true;
-	}
-	return false;
+	return carriedState == ECarriedState::Idle;
+}
+
+bool ACarryableActor::IsCarried()
+{
+	return carriedState == ECarriedState::Carried;
 }
 
 void ACarryableActor::Server_OnPickedUp_Implementation(USceneComponent* carrier)
@@ -47,7 +49,7 @@ void ACarryableActor::Multi_SetRenderDepth_Implementation(bool renderdepth)
 	MeshToHighlight->SetRenderCustomDepth(renderdepth);
 }
 
-void ACarryableActor::Server_DropObject_Implementation(FVector directionToLaunch)
+void ACarryableActor::Server_DropObject_Implementation(FVector directionToLaunch, FVector dropperLocation)
 {
 	carriedState = ECarriedState::Dropped;
 	PhysicsComponent->SetSimulatePhysics(true);

@@ -3,6 +3,8 @@
 
 #include "Train.h"
 #include "Net/UnrealNetwork.h"
+#include "FuelComponent.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 ATrain::ATrain()
@@ -11,6 +13,7 @@ ATrain::ATrain()
 	PrimaryActorTick.bCanEverTick = true;
 	SetReplicates(true);
 	SetReplicateMovement(true);
+	FuelComponent = CreateDefaultSubobject<UFuelComponent>(TEXT("FuelComponent"));
 }
 
 void ATrain::StartTrain()
@@ -22,7 +25,6 @@ void ATrain::StartTrain()
 void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 
@@ -35,6 +37,7 @@ void ATrain::Tick(float DeltaTime)
 		UpdateSpeed(DeltaTime);
 		UpdateLocation(DeltaTime);
 	}
+	UpdateFuelComponent(DeltaTime);
 }
 
 
@@ -73,9 +76,6 @@ void ATrain::UpdateSpeed(float deltaTime)
 	default:
 		break;
 	}
-	if (currentTrainState != ETrainState::stopped && currentTrainState != ETrainState::decelerating) {
-		//BurnFuel();
-	}
 }
 
 
@@ -84,6 +84,19 @@ void ATrain::UpdateLocation(float DeltaTime)
 	currentLocation = GetActorLocation();
 	currentLocation += FVector(0, 1, 0) * currentTrainSpeed * DeltaTime;
 	SetActorLocation(currentLocation, true);
+}
+
+void ATrain::UpdateFuelComponent(float DeltaTime)
+{
+	if (currentTrainState != ETrainState::stopped && currentTrainState != ETrainState::decelerating) {
+		FuelComponent->bBurning = false;
+	}
+	else {
+		FuelComponent->bBurning = true;
+	}
+	if (!FuelComponent->HasFuel()) {
+		SetTrainState(ETrainState::decelerating);
+	}
 }
 
 
