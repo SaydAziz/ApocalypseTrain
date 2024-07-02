@@ -21,7 +21,6 @@ UFuelComponent::UFuelComponent()
 }
 
 
-// Called when the game starts
 void UFuelComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,16 +28,9 @@ void UFuelComponent::BeginPlay()
 
 	for (TActorIterator<APlayerManager> IT(GetWorld()); IT; ++IT)
 	{
-		APlayerManager* foo = *IT;
+		PlayerManager = *IT;
 	}
 
-	for (TActorIterator<AActor> It(GetWorld(), APlayerManager::StaticClass()); It; ++It)
-	{
-		AActor* Actor = *It;
-	}
-
-	PlayerManager = Cast< APlayerManager>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerManager::StaticClass()));
-	// ...
 	DepositTrigger = GetOwner()->FindComponentByTag<UBoxComponent>("FuelDeposit");
 	MeshToHighlight = GetOwner()->FindComponentByTag<UStaticMeshComponent>("MeshToHighlight");
 

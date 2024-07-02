@@ -49,7 +49,6 @@ void AFuel::OnFuelBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 void AFuel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	//DOREPLIFETIME(AFuel, LastOverlappedDeposit)
 }
 
 void AFuel::OnFuelDeposited()
