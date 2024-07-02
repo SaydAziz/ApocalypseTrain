@@ -35,4 +35,8 @@ public:
 
 	int RegisterPlayerWithManager(class APlayerCharacter* joinedPlayer);
 
+	bool IsOverlappingPlayer(class UBoxComponent* box);
+
+	bool IsOverlappingPlayerWithFuel(class UBoxComponent* box);
+
 };
