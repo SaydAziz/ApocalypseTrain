@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Weapon.h"
 #include "PlayerCharacter.generated.h"
 
 UENUM()
@@ -61,8 +62,16 @@ protected:
 	//INTERACT MECHANICS
 	UPROPERTY(BlueprintReadOnly)
 	bool CarryingItem;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	AWeapon* EquippedWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<AWeapon> DefaultWeapon;
+
 
 	//DASH MECHANICS
 	UPROPERTY(EditAnywhere, Category = Dash)
@@ -90,6 +99,7 @@ protected:
 
 	void InteractReleased(const FInputActionValue& Value);
 
+	void EquipWeapon(AWeapon* Weapon);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

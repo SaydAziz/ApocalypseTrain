@@ -31,6 +31,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
+
+	EquipWeapon(Cast<AWeapon>(GetWorld()->SpawnActor(DefaultWeapon)));
 }
 
 // Called every frame
@@ -207,6 +209,14 @@ void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 {
 	Server_OnInteract(false);
+}
+
+void APlayerCharacter::EquipWeapon(AWeapon* Weapon)
+{
+	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+	EquippedWeapon = Weapon;
+	EquippedWeapon->AttachToActor(this, AttachmentRules);
+
 }
 
 void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)

@@ -6,7 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
-UCLASS()
+
+UCLASS(Abstract)
 class APOCTRAINNETWORKED_API AWeapon : public AActor
 {
 	GENERATED_BODY()
@@ -19,8 +20,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	float AttackRate;
+	float Damage;
+	
+	virtual void Equip();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Attack();
 
 };
