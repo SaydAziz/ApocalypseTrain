@@ -25,7 +25,15 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
+void AWeapon::StartAttack()
+{
+}
+
 void AWeapon::Attack()
+{
+}
+
+void AWeapon::StopAttack()
 {
 }
 

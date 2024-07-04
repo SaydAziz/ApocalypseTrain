@@ -98,7 +98,9 @@ protected:
 
 	void DoDash(const FInputActionValue& Value);
 
-	void DoAttack(const FInputActionValue& Value);
+	void StartAttack(const FInputActionValue& Value);
+
+	void StopAttack(const FInputActionValue& Value);
 
 	void InteractPressed(const FInputActionValue& Value);
 

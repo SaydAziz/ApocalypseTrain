@@ -82,7 +82,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
-		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::DoAttack);
+		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAttack);
+		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAttack);
 		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
@@ -195,9 +196,14 @@ void APlayerCharacter::DoDash(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::DoAttack(const FInputActionValue& Value)
+void APlayerCharacter::StartAttack(const FInputActionValue& Value)
 {
-	EquippedWeapon->Attack();
+	EquippedWeapon->StartAttack();
+}
+
+void APlayerCharacter::StopAttack(const FInputActionValue& Value)
+{
+	EquippedWeapon->StopAttack();
 }
 
 

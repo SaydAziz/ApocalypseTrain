@@ -22,13 +22,24 @@ void AProjectileWeapon::Tick(float DeltaTime)
 
 }
 
+void AProjectileWeapon::StartAttack()
+{
+	Attack();
+	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AProjectileWeapon::Attack, AttackRate, true);
+}
+
+void AProjectileWeapon::StopAttack()
+{
+	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
+}
+
 void AProjectileWeapon::Attack()
 {
 	FHitResult* HitResult = new FHitResult();
 
 	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
 	FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
-	FVector EndTrace = ((ForwardVector * 2000.0f) + StartTrace);
+	FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
 
 	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
 

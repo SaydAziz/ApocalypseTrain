@@ -20,8 +20,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float AttackRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float Damage;
+
+	FTimerHandle AttackRateTimerHandle;
 	
 	virtual void Equip();
 
@@ -29,6 +34,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void StartAttack();
 	virtual void Attack();
+	virtual void StopAttack();
 
 };
