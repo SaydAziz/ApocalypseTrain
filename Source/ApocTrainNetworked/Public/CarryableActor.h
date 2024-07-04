@@ -36,6 +36,7 @@ public:
 
 	virtual bool CurrentlyInteractable() override;
 
+	bool IsCarried();
 
 	UFUNCTION()
 	void OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -50,8 +51,8 @@ public:
 	void Multi_SetRenderDepth_Implementation(bool renderdepth);
 
 	UFUNCTION(Server, Unreliable)
-	void Server_DropObject(FVector directionToLaunch);
-	void Server_DropObject_Implementation(FVector directionToLaunch);
+	virtual void Server_DropObject(FVector directionToLaunch, FVector dropperLocation);
+	virtual void Server_DropObject_Implementation(FVector directionToLaunch, FVector dropperLocation);
 
 
 protected:

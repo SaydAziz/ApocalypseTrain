@@ -12,11 +12,6 @@ enum class ETrainState : uint8 {
 	stopped UMETA(DIsplayName = "Stopped"), accelerating UMETA(DIsplayName = "Accelerating"), decelerating UMETA(DIsplayName = "Decelerating")
 };
 
-UENUM()
-enum class EFuelState : uint8 {
-	normal UMETA(DIsplayName = "Normal"), critical UMETA(DIsplayName = "Critical")
-};
-
 
 UCLASS()
 class APOCTRAINNETWORKED_API ATrain : public AActor
@@ -26,10 +21,8 @@ class APOCTRAINNETWORKED_API ATrain : public AActor
 public:	
 
 	ATrain();
-	void UpdateSpeed(float deltaTime);
 	FVector GetTrainLocation();
 	bool IsTrainStopped();
-
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -55,7 +48,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	bool IsGameOverCountingDown();
+	void UpdateSpeed(float deltaTime);
 	void UpdateLocation(float DeltaTime);
+	void UpdateFuelComponent(float DeltaTime);
 	UFUNCTION()
 	void SetTrainState(ETrainState stateToSet);
 	UFUNCTION(BlueprintCallable)
@@ -65,5 +60,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void NotifyTrainStop();
 
+	UPROPERTY(EditDefaultsOnly)
+	class UFuelComponent* FuelComponent;
 
 };
