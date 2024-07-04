@@ -39,6 +39,9 @@ public:
 	class UInputAction* DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* AttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* InteractAction;
 
 	//INTERACTION MECHANICS
@@ -94,6 +97,8 @@ protected:
 	void DoLook(const FInputActionValue& Value);
 
 	void DoDash(const FInputActionValue& Value);
+
+	void DoAttack(const FInputActionValue& Value);
 
 	void InteractPressed(const FInputActionValue& Value);
 

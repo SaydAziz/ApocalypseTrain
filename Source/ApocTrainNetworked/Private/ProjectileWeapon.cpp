@@ -26,19 +26,20 @@ void AProjectileWeapon::Attack()
 {
 	FHitResult* HitResult = new FHitResult();
 
-	FVector StartTrace = GetParentActor()->GetActorLocation();
-	FVector ForwardVector = GetParentActor()->GetActorForwardVector();
+	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
+	FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
 	FVector EndTrace = ((ForwardVector * 2000.0f) + StartTrace);
 
 	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
 
-	TraceParams->AddIgnoredActor(GetParentActor());
+	TraceParams->AddIgnoredActor(GetAttachParentActor());
+	TraceParams->AddIgnoredActor(this);
+
+	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
 
 	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
 	{
-		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
-
-
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult->GetActor()->GetName()));
 	}
 
 

@@ -82,6 +82,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
+		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::DoAttack);
 		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
@@ -192,6 +193,11 @@ void APlayerCharacter::DoDash(const FInputActionValue& Value)
 		GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &APlayerCharacter::ResetDash, DashCooldown, false);
 
 	}
+}
+
+void APlayerCharacter::DoAttack(const FInputActionValue& Value)
+{
+	EquippedWeapon->Attack();
 }
 
 
