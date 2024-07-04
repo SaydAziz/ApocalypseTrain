@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponData.h"
 #include "Weapon.generated.h"
 
 
@@ -21,10 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	float AttackRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	float Damage;
+	UWeaponData* Data;
 
 	FTimerHandle AttackRateTimerHandle;
 	

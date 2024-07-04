@@ -25,7 +25,7 @@ void AProjectileWeapon::Tick(float DeltaTime)
 void AProjectileWeapon::StartAttack()
 {
 	Attack();
-	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AProjectileWeapon::Attack, AttackRate, true);
+	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AProjectileWeapon::Attack, Data->AttackRate, true);
 }
 
 void AProjectileWeapon::StopAttack()
