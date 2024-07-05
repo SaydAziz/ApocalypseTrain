@@ -130,4 +130,8 @@ public:
 	void Server_OnInteract(bool interacting);
 	void Server_OnInteract_Implementation(bool interacting);
 
+	UFUNCTION(Server, Unreliable)
+	void Server_DoDash(FVector Impulse);
+	void Server_DoDash_Implementation(FVector Impulse);
+
 };

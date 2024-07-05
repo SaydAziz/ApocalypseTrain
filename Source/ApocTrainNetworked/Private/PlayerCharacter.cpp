@@ -193,7 +193,16 @@ void APlayerCharacter::DoDash(const FInputActionValue& Value)
 		bCanDash = false;
 		GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &APlayerCharacter::ResetDash, DashCooldown, false);
 
+		if (!HasAuthority()) 
+		{
+			Server_DoDash(Impulse);
+		}
 	}
+}
+
+void APlayerCharacter::Server_DoDash_Implementation(FVector Impulse)
+{
+	GetCharacterMovement()->Launch(Impulse);
 }
 
 void APlayerCharacter::StartAttack(const FInputActionValue& Value)
