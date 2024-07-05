@@ -27,7 +27,9 @@ protected:
 	
 	virtual void Equip() override;
 
-	EProjectileWeaponState currentWeaponState;
+	virtual void SetWeaponState(EProjectileWeaponState NewWeaponState);
+
+	EProjectileWeaponState CurrentWeaponState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float ReloadTime;
@@ -41,6 +43,7 @@ public:
 	virtual void StartAttack() override;
 	virtual void StopAttack() override;
 	virtual void Attack() override;
+	virtual void ResetAttack() override;
 	
 	virtual void Reload();
 

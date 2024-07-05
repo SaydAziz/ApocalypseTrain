@@ -37,6 +37,10 @@ void AWeapon::StopAttack()
 {
 }
 
+void AWeapon::ResetAttack()
+{
+}
+
 void AWeapon::Equip()
 {
 }

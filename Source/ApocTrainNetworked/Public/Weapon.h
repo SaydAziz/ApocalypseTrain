@@ -25,6 +25,7 @@ protected:
 	UWeaponData* Data;
 
 	FTimerHandle AttackRateTimerHandle;
+	FTimerHandle CanAttackTimerHandle;
 	
 	virtual void Equip();
 
@@ -35,5 +36,6 @@ public:
 	virtual void StartAttack();
 	virtual void Attack();
 	virtual void StopAttack();
+	virtual void ResetAttack();
 
 };

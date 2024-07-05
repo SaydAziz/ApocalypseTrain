@@ -24,8 +24,12 @@ void AProjectileWeapon::Tick(float DeltaTime)
 
 void AProjectileWeapon::StartAttack()
 {
-	Attack();
-	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AProjectileWeapon::Attack, Data->AttackRate, true);
+	if (CurrentWeaponState != EProjectileWeaponState::shooting)
+	{
+		SetWeaponState(EProjectileWeaponState::shooting);
+		Attack();
+		GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AProjectileWeapon::Attack, Data->AttackRate, true);
+	}
 }
 
 void AProjectileWeapon::StopAttack()
@@ -35,6 +39,7 @@ void AProjectileWeapon::StopAttack()
 
 void AProjectileWeapon::Attack()
 {
+	GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
 	FHitResult* HitResult = new FHitResult();
 
 	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
@@ -56,12 +61,28 @@ void AProjectileWeapon::Attack()
 
 }
 
+void AProjectileWeapon::ResetAttack()
+{
+	SetWeaponState(EProjectileWeaponState::idle);
+}
+
 void AProjectileWeapon::Reload()
 {
 }
 
 void AProjectileWeapon::Equip()
 {
+}
+
+void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
+{
+	if (CurrentWeaponState != NewWeaponState)
+	{
+		CurrentWeaponState = NewWeaponState;
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
+
+		//Add transition logic here
+	}
 }
 
 
