@@ -9,6 +9,12 @@ AWeapon::AWeapon()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
+	PickUpTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("PickUP Trigger"));
+
+	RootComponent = WeaponMesh;
+	PickUpTrigger->SetupAttachment(RootComponent);
+
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +45,11 @@ void AWeapon::StopAttack()
 
 void AWeapon::ResetAttack()
 {
+}
+
+void AWeapon::Server_Attack_Implementation()
+{
+
 }
 
 void AWeapon::Equip()

@@ -2,6 +2,7 @@
 
 
 #include "ProjectileWeapon.h"
+#include "NiagaraFunctionLibrary.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -39,26 +40,42 @@ void AProjectileWeapon::StopAttack()
 
 void AProjectileWeapon::Attack()
 {
-	GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
-	FHitResult* HitResult = new FHitResult();
-
-	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
-	FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
-	FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
-
-	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
-
-	TraceParams->AddIgnoredActor(GetAttachParentActor());
-	TraceParams->AddIgnoredActor(this);
-
-	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
-
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
+	if (!HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult->GetActor()->GetName()));
+		GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
+		Server_Attack();
 	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
+		FHitResult* HitResult = new FHitResult();
 
+		FVector StartTrace = GetAttachParentActor()->GetActorLocation();
+		FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
+		FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
 
+		FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
+
+		TraceParams->AddIgnoredActor(GetAttachParentActor());
+		TraceParams->AddIgnoredActor(this);
+
+		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
+
+		if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult->GetActor()->GetName()));
+		}
+
+		Multicast_AttackEffects();
+	}
+}
+
+void AProjectileWeapon::Multicast_AttackEffects_Implementation() 
+{
+	if (Data->BulletTracer)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation(), GetAttachParentActor()->GetActorForwardVector().Rotation());
+	}
 }
 
 void AProjectileWeapon::ResetAttack()
@@ -69,6 +86,12 @@ void AProjectileWeapon::ResetAttack()
 void AProjectileWeapon::Reload()
 {
 }
+
+void AProjectileWeapon::Server_Attack_Implementation()
+{
+	Attack();
+}
+
 
 void AProjectileWeapon::Equip()
 {

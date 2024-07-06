@@ -69,7 +69,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Weapon)
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
@@ -106,7 +106,6 @@ protected:
 
 	void InteractReleased(const FInputActionValue& Value);
 
-	void EquipWeapon(AWeapon* Weapon);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -120,18 +119,20 @@ public:
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DropCarriedItem();
-	void Server_DropCarriedItem_Implementation();
 
 	UFUNCTION(Server, Unreliable)
 	void Server_PickupItem(class ACarryableActor* itemToCarry);
-	void Server_PickupItem_Implementation(class ACarryableActor* itemToCarry);
 
 	UFUNCTION(Server, Reliable)
 	void Server_OnInteract(bool interacting);
-	void Server_OnInteract_Implementation(bool interacting);
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DoDash(FVector Impulse);
-	void Server_DoDash_Implementation(FVector Impulse);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_EquipWeapon(AWeapon* Weapon);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_SpawnDefaultWeapon();
 
 };

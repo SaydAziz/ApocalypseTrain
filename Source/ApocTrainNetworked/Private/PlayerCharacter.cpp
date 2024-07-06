@@ -32,7 +32,7 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
 
-	EquipWeapon(Cast<AWeapon>(GetWorld()->SpawnActor(DefaultWeapon)));
+	Server_SpawnDefaultWeapon();
 }
 
 // Called every frame
@@ -61,6 +61,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, EquippedWeapon);
 }
 
 // Called to bind functionality to input
@@ -153,8 +155,10 @@ void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
 	Interacted = interacted;
 }
 
-
-
+void APlayerCharacter::Server_SpawnDefaultWeapon_Implementation()
+{
+	Server_EquipWeapon(Cast<AWeapon>(GetWorld()->SpawnActor(DefaultWeapon)));
+}
 
 void APlayerCharacter::DoMove(const FInputActionValue& Value)
 {
@@ -215,7 +219,6 @@ void APlayerCharacter::StopAttack(const FInputActionValue& Value)
 	EquippedWeapon->StopAttack();
 }
 
-
 void APlayerCharacter::ResetDash()
 {
 	bCanDash = true;
@@ -232,12 +235,13 @@ void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 	Server_OnInteract(false);
 }
 
-void APlayerCharacter::EquipWeapon(AWeapon* Weapon)
+void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 {
 	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
 	EquippedWeapon = Weapon;
 	EquippedWeapon->AttachToActor(this, AttachmentRules);
-
+	EquippedWeapon->SetOwner(this);
+	
 }
 
 void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "NiagaraSystem.h"
 #include "WeaponData.generated.h"
 
 /**
@@ -20,4 +21,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	UNiagaraSystem* BulletTracer;
 };

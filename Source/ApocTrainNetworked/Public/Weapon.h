@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/BoxComponent.h"
 #include "WeaponData.h"
 #include "Weapon.generated.h"
 
@@ -21,11 +22,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UBoxComponent* PickUpTrigger;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* WeaponMesh;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	UWeaponData* Data;
 
 	FTimerHandle AttackRateTimerHandle;
 	FTimerHandle CanAttackTimerHandle;
+
 	
 	virtual void Equip();
 
@@ -38,4 +46,6 @@ public:
 	virtual void StopAttack();
 	virtual void ResetAttack();
 
+	UFUNCTION(Server, Reliable)
+	virtual void Server_Attack();
 };
