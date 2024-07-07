@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "CarryableActor.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -17,26 +18,56 @@ APlayerCharacter::APlayerCharacter()
 	SetReplicates(true);
 	SetReplicateMovement(true);
 	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
-}
+	CollisionCapsule = FindComponentByClass<UCapsuleComponent>();
 
+
+	CurrentMovementState = EPlayerMovementState::standing;
+
+	DashImpulseStrength = 2000.0f;
+	DashCooldown = 1.0f;
+	bCanDash = true;
+}
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
+
+	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
+	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+
+	Server_SpawnDefaultWeapon();
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
+	
 	Super::Tick(DeltaTime);
+	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentState));
+
+	float CurrentSpeed = GetVelocity().Size();
+	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
+	{
+		SetPlayerMovementState(EPlayerMovementState::dashing);
+	}
+	else if (CurrentSpeed > 0)
+	{
+		SetPlayerMovementState(EPlayerMovementState::walking);
+	}
+	else 
+	{
+		SetPlayerMovementState(EPlayerMovementState::standing);
+	}
 
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, EquippedWeapon);
 }
 
 // Called to bind functionality to input
@@ -58,6 +89,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
+		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAttack);
+		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAttack);
 		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
@@ -76,21 +109,17 @@ bool APlayerCharacter::IsFacingWall()
 	forward.Z = 0;
 	FVector end = start + (forward * 1.2);
 	FHitResult hit;
+
 	if (GetWorld()) {
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
 		QueryParams.AddIgnoredActor(carriedObject);
 		//QueryParams.AddIgnoredActor(CurrentWeapon);
 		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_WorldDynamic, QueryParams, FCollisionResponseParams());
-		/*if (actorHit && hit.GetActor()) {
-			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(hit.GetActor())) {
-				return false;
-			}
-			if (AObstacle* obstacle = Cast<AObstacle>(hit.GetActor())) {
-				return false;
-			}
+		if (actorHit && hit.GetActor()) 
+		{
 			return true;
-		}*/
+		}
 	}
 	return false;
 }
@@ -131,6 +160,11 @@ void APlayerCharacter::Server_OnInteract_Implementation(bool interacted)
 	Interacted = interacted;
 }
 
+void APlayerCharacter::Server_SpawnDefaultWeapon_Implementation()
+{
+	Server_EquipWeapon(Cast<AWeapon>(GetWorld()->SpawnActor(DefaultWeapon)));
+}
+
 void APlayerCharacter::DoMove(const FInputActionValue& Value)
 {
 	const FVector2D value = Value.Get<FVector2D>();
@@ -158,16 +192,102 @@ void APlayerCharacter::DoLook(const FInputActionValue& Value)
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
 {
+	if (bCanDash)
+	{
+		FVector DashDir = GetVelocity().GetSafeNormal();
+		FVector Impulse = DashDir * DashImpulseStrength;
 
+		GetCharacterMovement()->Launch(Impulse);
+
+		bCanDash = false;
+		GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &APlayerCharacter::ResetDash, DashCooldown, false);
+
+		if (!HasAuthority()) 
+		{
+			Server_DoDash(Impulse);
+		}
+	}
+}
+
+void APlayerCharacter::Server_DoDash_Implementation(FVector Impulse)
+{
+	GetCharacterMovement()->Launch(Impulse);
+}
+
+void APlayerCharacter::StartAttack(const FInputActionValue& Value)
+{
+	EquippedWeapon->StartAttack();
+}
+
+void APlayerCharacter::StopAttack(const FInputActionValue& Value)
+{
+	EquippedWeapon->StopAttack();
+}
+
+void APlayerCharacter::ResetDash()
+{
+	bCanDash = true;
 }
 
 void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 {
-	Server_OnInteract(true);
-	Server_DropCarriedItem();
+	if (WeaponOnGround != NULL)
+	{
+		Server_EquipWeapon(WeaponOnGround);
+	}
+	else
+	{
+		Server_OnInteract(true);
+		Server_DropCarriedItem();
+	}
+
 }
 
 void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 {
 	Server_OnInteract(false);
+}
+
+void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(AWeapon::StaticClass()))
+	{
+		WeaponOnGround = Cast<AWeapon>(OtherActor);
+	}
+}
+
+void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA(AWeapon::StaticClass()))
+	{
+		WeaponOnGround = NULL;
+	}
+}
+
+void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+
+	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+	EquippedWeapon = Weapon;
+	EquippedWeapon->AttachToActor(this, AttachmentRules);
+	EquippedWeapon->Equip();
+	EquippedWeapon->SetOwner(this);
+	
+	
+}
+
+void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)
+{
+	if (CurrentMovementState != NewMovementState)
+	{
+		CurrentMovementState = NewMovementState;
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentMovementState));
+
+		//Add transition logic here
+	}
+
 }

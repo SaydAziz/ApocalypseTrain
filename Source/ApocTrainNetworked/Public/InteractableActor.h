@@ -36,7 +36,6 @@ public:
 	virtual void Multi_NoPlayersOverlapping_Implementation();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	
 
 protected:

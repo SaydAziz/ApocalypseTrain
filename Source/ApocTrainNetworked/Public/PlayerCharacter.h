@@ -5,9 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Weapon.h"
+#include "Components/CapsuleComponent.h"
 #include "PlayerCharacter.generated.h"
 
-
+UENUM()
+enum class EPlayerMovementState : uint8
+{
+	standing UMETA(DisplayName = "Standing"), walking UMETA(DisplayName = "Walking"), dashing UMETA(DisplayName = "Dashing")
+};
 
 UCLASS()
 class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter
@@ -18,6 +24,9 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+
+
+	//INPUT CONTROLS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* DefaultMappingContext;
 
@@ -31,28 +40,59 @@ public:
 	class UInputAction* DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* AttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* InteractAction;
 
+	//INTERACTION MECHANICS
 	class ACarryableActor* carriedObject;
 	class USceneComponent* carrySlot;
 	class USkeletalMeshComponent* characterMesh;
-//protected:
+
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
-
 	UPROPERTY(BlueprintReadOnly)
 	int PlayerIndex;
 
+
 protected:
 
+	//PLAYER STATE
+	EPlayerMovementState CurrentMovementState;
+
+	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
+
+	//INTERACT MECHANICS
 	UPROPERTY(BlueprintReadOnly)
 	bool CarryingItem;
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
 
-	class USphereComponent* InteractionTrigger;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Weapon)
+	AWeapon* EquippedWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<AWeapon> DefaultWeapon;
+
+	AWeapon* WeaponOnGround;
+
+
+	//DASH MECHANICS
+	UPROPERTY(EditAnywhere, Category = Dash)
+	float DashImpulseStrength;
+	UPROPERTY(EditAnywhere, Category = Dash)
+	float DashCooldown;
+
+	bool bCanDash;
+
+	FTimerHandle DashCooldownTimerHandle;
+
+	void ResetDash();
+
+	UCapsuleComponent* CollisionCapsule;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -62,9 +102,19 @@ protected:
 
 	void DoDash(const FInputActionValue& Value);
 
+	void StartAttack(const FInputActionValue& Value);
+
+	void StopAttack(const FInputActionValue& Value);
+
 	void InteractPressed(const FInputActionValue& Value);
 
 	void InteractReleased(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:	
 	// Called every frame
@@ -79,14 +129,20 @@ public:
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DropCarriedItem();
-	void Server_DropCarriedItem_Implementation();
 
 	UFUNCTION(Server, Unreliable)
 	void Server_PickupItem(class ACarryableActor* itemToCarry);
-	void Server_PickupItem_Implementation(class ACarryableActor* itemToCarry);
 
 	UFUNCTION(Server, Reliable)
 	void Server_OnInteract(bool interacting);
-	void Server_OnInteract_Implementation(bool interacting);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_DoDash(FVector Impulse);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_EquipWeapon(AWeapon* Weapon);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_SpawnDefaultWeapon();
 
 };
