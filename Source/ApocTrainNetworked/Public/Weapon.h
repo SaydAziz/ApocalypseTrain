@@ -23,6 +23,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USceneComponent* WeaponRoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* PickUpTrigger;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,12 +38,12 @@ protected:
 	FTimerHandle CanAttackTimerHandle;
 
 	
-	virtual void Equip();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Equip();
 	virtual void StartAttack();
 	virtual void Attack();
 	virtual void StopAttack();

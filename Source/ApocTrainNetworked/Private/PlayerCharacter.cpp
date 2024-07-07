@@ -18,6 +18,8 @@ APlayerCharacter::APlayerCharacter()
 	SetReplicates(true);
 	SetReplicateMovement(true);
 	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
+	CollisionCapsule = FindComponentByClass<UCapsuleComponent>();
+
 
 	CurrentMovementState = EPlayerMovementState::standing;
 
@@ -31,6 +33,9 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
+
+	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
+	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
 
 	Server_SpawnDefaultWeapon();
 }
@@ -226,8 +231,16 @@ void APlayerCharacter::ResetDash()
 
 void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 {
-	Server_OnInteract(true);
-	Server_DropCarriedItem();
+	if (WeaponOnGround != NULL)
+	{
+		Server_EquipWeapon(WeaponOnGround);
+	}
+	else
+	{
+		Server_OnInteract(true);
+		Server_DropCarriedItem();
+	}
+
 }
 
 void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
@@ -235,12 +248,35 @@ void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 	Server_OnInteract(false);
 }
 
+void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(AWeapon::StaticClass()))
+	{
+		WeaponOnGround = Cast<AWeapon>(OtherActor);
+	}
+}
+
+void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA(AWeapon::StaticClass()))
+	{
+		WeaponOnGround = NULL;
+	}
+}
+
 void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 {
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+
 	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
 	EquippedWeapon = Weapon;
 	EquippedWeapon->AttachToActor(this, AttachmentRules);
+	EquippedWeapon->Equip();
 	EquippedWeapon->SetOwner(this);
+	
 	
 }
 

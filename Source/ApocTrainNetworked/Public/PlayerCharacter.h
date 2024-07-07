@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Weapon.h"
+#include "Components/CapsuleComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UENUM()
@@ -75,6 +76,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<AWeapon> DefaultWeapon;
 
+	AWeapon* WeaponOnGround;
+
 
 	//DASH MECHANICS
 	UPROPERTY(EditAnywhere, Category = Dash)
@@ -83,12 +86,13 @@ protected:
 	float DashCooldown;
 
 	bool bCanDash;
+
 	FTimerHandle DashCooldownTimerHandle;
 
 	void ResetDash();
 
+	UCapsuleComponent* CollisionCapsule;
 
-	class USphereComponent* InteractionTrigger;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -105,6 +109,12 @@ protected:
 	void InteractPressed(const FInputActionValue& Value);
 
 	void InteractReleased(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:	
 	// Called every frame
