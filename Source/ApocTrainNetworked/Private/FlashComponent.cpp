@@ -3,6 +3,8 @@
 
 #include "FlashComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values for this component's properties
 UFlashComponent::UFlashComponent()
@@ -18,6 +20,7 @@ UFlashComponent::UFlashComponent()
 void UFlashComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetIsReplicated(true);
 	GetMaterialsToFlash();
 }
 
@@ -37,11 +40,10 @@ void UFlashComponent::GetMaterialsToFlash()
 	}
 }
 
-
-void UFlashComponent::ResetFlashColor()
+void UFlashComponent::OnRep_MaterialColor()
 {
 	for (UMaterialInstanceDynamic* mat : FlashMaterials) {
-		mat->SetVectorParameterValue(FName("FlashVector"), FVector(0,0,0));
+		mat->SetVectorParameterValue(FName("FlashVector"), MaterialColor);
 	}
 }
 
@@ -55,9 +57,29 @@ void UFlashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UFlashComponent::Flash()
 {
-	for (UMaterialInstanceDynamic* mat : FlashMaterials) {
-		mat->SetVectorParameterValue(FName("FlashVector"), colorToFlash);
-	}
+	SetMaterialParameter(ColorToFlash);
 	GetWorld()->GetTimerManager().SetTimer(flashTimerHandle, this, &UFlashComponent::ResetFlashColor, FlashDuration, false);
 }
+
+void UFlashComponent::ResetFlashColor()
+{
+	SetMaterialParameter(FLinearColor(0, 0, 0, 0));
+}
+
+void UFlashComponent::SetMaterialParameter(FLinearColor NewParameter)
+{
+	MaterialColor = NewParameter;
+
+	// Ensure the change is replicated to clients
+	OnRep_MaterialColor();
+}
+
+void UFlashComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UFlashComponent, MaterialColor)
+}
+
+
+
 

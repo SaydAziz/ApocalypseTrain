@@ -7,6 +7,7 @@
 #include "FlashComponent.generated.h"
 
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class APOCTRAINNETWORKED_API UFlashComponent : public UActorComponent
 {
@@ -23,18 +24,26 @@ protected:
 
 	void GetMaterialsToFlash();
 
+	UPROPERTY(Replicated)
 	TArray<UMaterialInstanceDynamic*> FlashMaterials;
 	
 	UPROPERTY(EditDefaultsOnly)
-	FLinearColor colorToFlash;
+	FLinearColor ColorToFlash;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MaterialColor)
+	FLinearColor MaterialColor;
+
+	UFUNCTION()
+	void OnRep_MaterialColor();
 
 	UPROPERTY(EditDefaultsOnly)
 	float FlashDuration;
 
 	FTimerHandle flashTimerHandle;
 
-	UFUNCTION()
 	void ResetFlashColor();
+
+	void SetMaterialParameter(FLinearColor NewParameter);
 
 public:
 	// Called every frame
@@ -42,4 +51,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Flash();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
