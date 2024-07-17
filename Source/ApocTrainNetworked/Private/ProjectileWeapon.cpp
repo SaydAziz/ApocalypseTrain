@@ -3,6 +3,7 @@
 
 #include "ProjectileWeapon.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Damagable.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -48,7 +49,7 @@ void AProjectileWeapon::Attack()
 	else
 	{
 		GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
-		FHitResult* HitResult = new FHitResult();
+		FHitResult HitResult = FHitResult();
 
 		FVector StartTrace = GetAttachParentActor()->GetActorLocation();
 		FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
@@ -60,10 +61,14 @@ void AProjectileWeapon::Attack()
 		TraceParams->AddIgnoredActor(this);
 
 		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
-
-		if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult->GetActor()->GetName()));
+			if (HitResult.GetActor()) {
+
+				if (IDamagable* damagableActor = Cast<IDamagable>(HitResult.GetActor())) {
+					damagableActor->Damage(Data->Damage);
+				}
+			}
 		}
 
 		Multicast_AttackEffects();

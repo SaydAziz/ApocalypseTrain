@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "ProjectileShooter.generated.h"
+#include "Damagable.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UProjectileShooter : public UInterface
+class UDamagable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,12 +16,15 @@ class UProjectileShooter : public UInterface
 /**
  * 
  */
-class APOCTRAINNETWORKED_API IProjectileShooter
+class APOCTRAINNETWORKED_API IDamagable
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
+	virtual void Damage(float damageToTake) = 0;
+
+	virtual float GetHealth() = 0;
 
 };

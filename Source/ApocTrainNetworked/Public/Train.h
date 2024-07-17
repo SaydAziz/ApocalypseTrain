@@ -61,6 +61,12 @@ protected:
 	void NotifyTrainStop();
 
 	UPROPERTY(EditDefaultsOnly)
-	class UFuelComponent* FuelComponent;
+	class UFuelComponent* fuelComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UPulseComponent* pulseComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UFlashComponent* flashComponent;
 
 };
