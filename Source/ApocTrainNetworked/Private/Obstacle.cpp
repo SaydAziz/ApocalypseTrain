@@ -5,6 +5,7 @@
 #include "PulseComponent.h"
 #include "FlashComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AObstacle::AObstacle()
@@ -21,7 +22,22 @@ void AObstacle::BeginPlay()
 {
 	Super::BeginPlay();
 	SetReplicates(true);
+	bAlwaysRelevant = true;
 	currentHealth = MaxHealth;
+}
+
+void AObstacle::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	switch (EndPlayReason)
+	{
+		case EEndPlayReason::Destroyed:
+			if (DestroyedDust) {
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestroyedDust, GetActorLocation(), GetActorRotation())->SetIsReplicated(true);
+			}
+			break;
+	}
 }
 
 // Called every frame
@@ -41,10 +57,7 @@ void AObstacle::Damage(float damageToTake)
 		flashComponent->Flash();
 	}
 	if (currentHealth <= 0) {
-		if (DestroyedDust) {
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestroyedDust, GetActorLocation(), GetActorRotation());
-		}
-		Destroy(0);
+		Destroy();
 	}
 }
 

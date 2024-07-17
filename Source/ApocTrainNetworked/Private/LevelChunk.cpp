@@ -23,7 +23,6 @@ void ALevelChunk::BeginPlay()
 			UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(Component);
 			if (mesh && mesh->ComponentHasTag("ChunkBase")) {
 				chunkLength = (mesh->GetStaticMesh()->GetBounds().BoxExtent.Y * 2) * mesh->GetComponentScale().Y;
-				GEngine->AddOnScreenDebugMessage(-1, 20, FColor::Magenta, FString::Printf(TEXT("CHUNK LENGTH: %d"), mesh->GetComponentScale().Y));
 			}
 		}
 	}

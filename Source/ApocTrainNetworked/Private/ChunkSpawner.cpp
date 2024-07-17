@@ -26,7 +26,6 @@ void AChunkSpawner::SpawnNewChunk()
 	int chunkIndex = FMath::RandRange(0,LevelChunks.Num()-1);
 	ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(LevelChunks[chunkIndex],new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
 	targetPostion += chunk->GetChunkLength();
-	GEngine->AddOnScreenDebugMessage(-1, 30, FColor::Blue, FString::Printf(TEXT("new target position: %f"), targetPostion));
 }
 
 bool AChunkSpawner::TargetReached()
