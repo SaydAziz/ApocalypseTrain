@@ -3,6 +3,8 @@
 
 #include "ChunkSpawner.h"
 #include "LevelChunk.h"
+#include "CustomUtils.h"
+#include <Train.h>
 
 // Sets default values
 AChunkSpawner::AChunkSpawner()
@@ -16,7 +18,7 @@ AChunkSpawner::AChunkSpawner()
 void AChunkSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetLeadingActor(CustomUtils::GetFirstActorOfClass<ATrain>(GetWorld()));
 }
 
 void AChunkSpawner::SpawnNewChunk()

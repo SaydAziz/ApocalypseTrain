@@ -31,15 +31,13 @@ protected:
 
 	bool TargetReached();
 
+	void SetLeadingActor(AActor* actor);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TSubclassOf<class ALevelChunk> > LevelChunks;
-
-	UFUNCTION(BlueprintCallable)
-	void SetLeadingActor(AActor* actor);
-
 	
 };

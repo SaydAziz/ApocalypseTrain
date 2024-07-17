@@ -11,7 +11,6 @@ AObstacle::AObstacle()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	SetReplicates(true);
 	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
 	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
 
@@ -21,6 +20,7 @@ AObstacle::AObstacle()
 void AObstacle::BeginPlay()
 {
 	Super::BeginPlay();
+	SetReplicates(true);
 	currentHealth = MaxHealth;
 }
 
