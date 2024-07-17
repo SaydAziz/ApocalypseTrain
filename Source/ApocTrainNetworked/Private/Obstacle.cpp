@@ -4,6 +4,7 @@
 #include "Obstacle.h"
 #include "PulseComponent.h"
 #include "FlashComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AObstacle::AObstacle()
@@ -13,6 +14,7 @@ AObstacle::AObstacle()
 	SetReplicates(true);
 	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
 	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
+
 }
 
 // Called when the game starts or when spawned
@@ -38,8 +40,10 @@ void AObstacle::Damage(float damageToTake)
 	if (flashComponent) {
 		flashComponent->Flash();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("health: %f"), currentHealth));
 	if (currentHealth <= 0) {
+		if (DestroyedDust) {
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestroyedDust, GetActorLocation(), GetActorRotation());
+		}
 		Destroy(0);
 	}
 }

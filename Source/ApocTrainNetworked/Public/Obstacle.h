@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UFlashComponent* flashComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* DestroyedDust;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
