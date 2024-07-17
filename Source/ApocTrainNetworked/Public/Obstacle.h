@@ -27,6 +27,12 @@ protected:
 
 	float currentHealth;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UPulseComponent* pulseComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UFlashComponent* flashComponent;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -5,6 +5,8 @@
 #include "Net/UnrealNetwork.h"
 #include "FuelComponent.h"
 #include "Components/BoxComponent.h"
+#include "PulseComponent.h"
+#include "FlashComponent.h"
 
 // Sets default values
 ATrain::ATrain()
@@ -13,7 +15,9 @@ ATrain::ATrain()
 	PrimaryActorTick.bCanEverTick = true;
 	SetReplicates(true);
 	SetReplicateMovement(true);
-	FuelComponent = CreateDefaultSubobject<UFuelComponent>(TEXT("FuelComponent"));
+	fuelComponent = CreateDefaultSubobject<UFuelComponent>(TEXT("FuelComponent"));
+	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
+	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
 }
 
 void ATrain::StartTrain()
@@ -89,12 +93,12 @@ void ATrain::UpdateLocation(float DeltaTime)
 void ATrain::UpdateFuelComponent(float DeltaTime)
 {
 	if (currentTrainState != ETrainState::stopped && currentTrainState != ETrainState::decelerating) {
-		FuelComponent->bBurning = false;
+		fuelComponent->bBurning = false;
 	}
 	else {
-		FuelComponent->bBurning = true;
+		fuelComponent->bBurning = true;
 	}
-	if (!FuelComponent->HasFuel()) {
+	if (!fuelComponent->HasFuel()) {
 		SetTrainState(ETrainState::decelerating);
 	}
 }
@@ -126,7 +130,7 @@ bool ATrain::IsTrainStopped()
 void ATrain::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	//DOREPLIFETIME(ATrain, currentLocation)
+	
 }
 
 bool ATrain::IsGameOverCountingDown()

@@ -2,6 +2,8 @@
 
 
 #include "Obstacle.h"
+#include "PulseComponent.h"
+#include "FlashComponent.h"
 
 // Sets default values
 AObstacle::AObstacle()
@@ -9,6 +11,8 @@ AObstacle::AObstacle()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	SetReplicates(true);
+	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
+	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +32,12 @@ void AObstacle::Tick(float DeltaTime)
 void AObstacle::Damage(float damageToTake)
 {
 	currentHealth -= damageToTake;
+	if (pulseComponent) {
+		pulseComponent->Pulse();
+	}
+	if (flashComponent) {
+		flashComponent->Flash();
+	}
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("health: %f"), currentHealth));
 	if (currentHealth <= 0) {
 		Destroy(0);
