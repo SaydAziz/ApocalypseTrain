@@ -15,6 +15,13 @@ enum class EPlayerMovementState : uint8
 	standing UMETA(DisplayName = "Standing"), walking UMETA(DisplayName = "Walking"), dashing UMETA(DisplayName = "Dashing")
 };
 
+UENUM()
+enum class EPlayerActionState : uint8
+{
+	idle UMETA(DisplayName = "Idle"), attacking UMETA(DisplayName = "Attacking"), carrying UMETA(DisplayName = "Carrying")
+};
+
+
 UCLASS()
 class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter
 {
@@ -64,8 +71,12 @@ protected:
 	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
 
 	//INTERACT MECHANICS
-	UPROPERTY(BlueprintReadOnly)
-	bool CarryingItem;
+	EPlayerActionState CurrentActionState;
+
+	void SetPlayerActionState(EPlayerActionState NewActionState);
+
+	//UPROPERTY(BlueprintReadOnly)
+	//bool bCarryingItem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
@@ -125,6 +136,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	bool IsCarryingItem();
+	bool IsAttacking();
 	bool IsFacingWall();
 
 	UFUNCTION(Server, Unreliable)

@@ -99,7 +99,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 bool APlayerCharacter::IsCarryingItem()
 {
-	return CarryingItem;
+	return CurrentActionState == EPlayerActionState::carrying;
+}
+
+bool APlayerCharacter::IsAttacking()
+{
+	return CurrentActionState == EPlayerActionState::attacking;
 }
 
 bool APlayerCharacter::IsFacingWall()
@@ -126,7 +131,7 @@ bool APlayerCharacter::IsFacingWall()
 
 void APlayerCharacter::Server_DropCarriedItem_Implementation()
 {
-	if (CarryingItem) {
+	if (IsCarryingItem()) {
 		if (carriedObject != NULL) {
 			float upwardForce = 0.5f;
 			if (IsFacingWall()) {
@@ -137,21 +142,20 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, GetActorLocation());
 			}
 		}
-		CarryingItem = false;
-		//AttachWeapon();
+		SetPlayerActionState(EPlayerActionState::idle);
+		
 	}
 }
 
 void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToCarry)
 {
-	if (CarryingItem) {
+	if (IsCarryingItem()) {
 		return;
 	}
-	CarryingItem = true;
+	SetPlayerActionState(EPlayerActionState::carrying);
 	carriedObject = itemToCarry;
-	//HolsterWeapon();
 	itemToCarry->Server_OnPickedUp(carrySlot);
-	//ShootReleased();
+	
 }
 
 
@@ -216,12 +220,20 @@ void APlayerCharacter::Server_DoDash_Implementation(FVector Impulse)
 
 void APlayerCharacter::StartAttack(const FInputActionValue& Value)
 {
-	EquippedWeapon->StartAttack();
+	if (!IsCarryingItem()) {
+		SetPlayerActionState(EPlayerActionState::attacking);
+		EquippedWeapon->StartAttack();
+	}
 }
 
 void APlayerCharacter::StopAttack(const FInputActionValue& Value)
 {
-	EquippedWeapon->StopAttack();
+	if (IsAttacking()) {
+		EquippedWeapon->StopAttack();
+		if (!IsCarryingItem()) {
+			SetPlayerActionState(EPlayerActionState::idle);
+		}
+	}
 }
 
 void APlayerCharacter::ResetDash()
@@ -290,4 +302,24 @@ void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementSt
 		//Add transition logic here
 	}
 
+}
+
+void APlayerCharacter::SetPlayerActionState(EPlayerActionState NewActionState)
+{
+	if (CurrentActionState != NewActionState) {
+		switch (NewActionState) {
+			case EPlayerActionState::idle:
+				if (CurrentActionState == EPlayerActionState::carrying) {
+				//AttachWeapon(); //this is for putting the weapon back in the players hands from their back
+				}
+				break;
+			case EPlayerActionState::attacking:
+				break;
+			case EPlayerActionState::carrying:
+				//HolsterWeapon(); //this is for putting the weapon on the players back while they are holding something
+				EquippedWeapon->StopAttack();
+				break;
+		}
+		CurrentActionState = NewActionState;
+	}
 }

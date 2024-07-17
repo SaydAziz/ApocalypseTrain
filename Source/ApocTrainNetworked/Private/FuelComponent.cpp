@@ -7,8 +7,9 @@
 #include "PlayerManager.h"
 #include <Net/UnrealNetwork.h>
 #include <Kismet/KismetMathLibrary.h>
-#include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
+#include "PulseComponent.h"
+#include "FlashComponent.h"
 
 // Sets default values for this component's properties
 UFuelComponent::UFuelComponent()
@@ -16,7 +17,6 @@ UFuelComponent::UFuelComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -111,6 +111,8 @@ void UFuelComponent::Server_AddFuel_Implementation(AFuel* fuel)
 {
 	if (!IsFull() && !fuel->IsCarried()) {
 		CurrentFuel += 1;
+		GetOwner()->FindComponentByClass<UPulseComponent>()->Pulse();
+		GetOwner()->FindComponentByClass<UFlashComponent>()->Flash();
 		fuel->Destroy();
 	}
 }
