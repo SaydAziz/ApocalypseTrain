@@ -5,6 +5,8 @@
 #include "LevelChunk.h"
 #include "CustomUtils.h"
 #include <Train.h>
+#include "NavMesh/NavMeshBoundsVolume.h"
+#include "NavigationSystem.h"
 
 // Sets default values
 AChunkSpawner::AChunkSpawner()
@@ -19,12 +21,14 @@ void AChunkSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	SetLeadingActor(CustomUtils::GetFirstActorOfClass<ATrain>(GetWorld()));
+	NavMeshBounds = CustomUtils::GetFirstActorOfClass<ANavMeshBoundsVolume>(GetWorld());
 }
 
 void AChunkSpawner::SpawnNewChunk()
 {
 	int chunkIndex = FMath::RandRange(0,LevelChunks.Num()-1);
 	ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(LevelChunks[chunkIndex],new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+	RelocateNavMesh(FVector(0,targetPostion - navMeshOffset,0));
 	targetPostion += chunk->GetChunkLength();
 }
 
@@ -48,5 +52,15 @@ void AChunkSpawner::Tick(float DeltaTime)
 void AChunkSpawner::SetLeadingActor(AActor* actor)
 {
 	leadingActor = actor;
+}
+
+void AChunkSpawner::RelocateNavMesh(FVector newLocation)
+{
+	if (NavMeshBounds) {
+		NavMeshBounds->SetActorLocation(newLocation);
+		if (UNavigationSystemV1* const NavSys = UNavigationSystemV1::GetCurrent(GetWorld())) {
+			NavSys->OnNavigationBoundsUpdated(NavMeshBounds);
+		}
+	}
 }
 

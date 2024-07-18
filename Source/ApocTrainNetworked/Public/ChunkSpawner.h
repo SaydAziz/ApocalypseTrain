@@ -27,11 +27,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float leaderTargetOffset;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float navMeshOffset;
+
 	void SpawnNewChunk();
 
 	bool TargetReached();
 
 	void SetLeadingActor(AActor* actor);
+
+	class ANavMeshBoundsVolume* NavMeshBounds;
+
+	void RelocateNavMesh(FVector newLocation);
 
 public:	
 	// Called every frame
