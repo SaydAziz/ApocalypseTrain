@@ -75,9 +75,6 @@ protected:
 
 	void SetPlayerActionState(EPlayerActionState NewActionState);
 
-	//UPROPERTY(BlueprintReadOnly)
-	//bool bCarryingItem;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float throwVelocity;
 
@@ -103,6 +100,13 @@ protected:
 	void ResetDash();
 
 	UCapsuleComponent* CollisionCapsule;
+
+
+	//AI Perception
+	UPROPERTY(EditDefaultsOnly)
+	class UAIPerceptionStimuliSourceComponent* StimulusSource;
+
+	void SetupStimulusSource();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

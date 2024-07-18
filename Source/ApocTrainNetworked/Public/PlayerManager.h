@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "PlayerManager.generated.h"
 
+class APlayerCharacter;
+
 UCLASS()
 class APOCTRAINNETWORKED_API APlayerManager : public AActor
 {
@@ -26,7 +28,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<class APlayerCharacter*> ActivePlayers;
+	TArray<APlayerCharacter*> ActivePlayers;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FColor> PlayerColors;
@@ -38,5 +40,7 @@ public:
 	bool IsOverlappingPlayer(class UBoxComponent* box);
 
 	bool IsOverlappingPlayerWithFuel(class UBoxComponent* box);
+
+	APlayerCharacter* GetClosestPlayer(FVector location);
 
 };

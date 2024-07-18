@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include <Perception/AIPerceptionTypes.h>
 #include "EnemyAIController.generated.h"
 
 /**
@@ -19,4 +20,11 @@ public:
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+
+	class UAISenseConfig_Sight* SightConfig;
+
+	void SetupPerceptionSystem();
+
+	UFUNCTION()
+	void OnTargetDetected(AActor* Actor, FAIStimulus const Stimulus);
 };
