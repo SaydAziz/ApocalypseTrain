@@ -9,14 +9,15 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"AIModule"
 			]
 		},
 		{
-      "Name": "EnhancedInput",
-      "Type": "Runtime",
-      "LoadingPhase": "Default"
-    }
+			"Name": "EnhancedInput",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
 	],
 	"Plugins": [
 		{
