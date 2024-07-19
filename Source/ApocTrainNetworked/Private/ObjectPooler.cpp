@@ -16,7 +16,9 @@ AObjectPooler::AObjectPooler()
 void AObjectPooler::BeginPlay()
 {
 	Super::BeginPlay();
-	CreateObjects();
+	if (HasAuthority()) {
+		CreateObjects();
+	}
 }
 
 void AObjectPooler::CreateObjects()
@@ -38,14 +40,13 @@ void AObjectPooler::Tick(float DeltaTime)
 
 void AObjectPooler::SpawnObject()
 {
-	if (Pool.IsEmpty()) {
-		return;
-	}
-	if ((*Pool.Peek())->CanSpawn()) {
-		IPoolable* pooledObject;
-		Pool.Dequeue(pooledObject);
-		pooledObject->OnSpawn();
-		Pool.Enqueue(pooledObject);
+	if (HasAuthority()) {
+		if (!Pool.IsEmpty() && (*Pool.Peek())->CanSpawn()) {
+			IPoolable* pooledObject;
+			Pool.Dequeue(pooledObject);
+			pooledObject->OnSpawn();
+			Pool.Enqueue(pooledObject);
+		}
 	}
 }
 
