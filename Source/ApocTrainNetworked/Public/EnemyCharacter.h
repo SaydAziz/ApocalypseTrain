@@ -7,10 +7,13 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "EnemyData.h"
 #include "Damagable.h"
+#include "Poolable.h"
 #include "EnemyCharacter.generated.h"
 
+class AEnemyAIController;
+
 UCLASS()
-class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IDamagable
+class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IDamagable, public IPoolable
 {
 	GENERATED_BODY()
 
@@ -35,6 +38,11 @@ protected:
 
 	virtual void InitializeEnemy();
 
+	//temp bool for isdead, should probobly make this a state
+	bool bIsDead;
+
+	AEnemyAIController* AIController;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -48,5 +56,11 @@ public:
 
 	virtual float GetHealth();
 
+	// Inherited via IPoolable
+	void OnSpawn() override;
+
+	void OnDespawn() override;
+
+	bool CanSpawn() override;
 
 };

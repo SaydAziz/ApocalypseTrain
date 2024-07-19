@@ -3,6 +3,7 @@
 
 #include "EnemyCharacter.h"
 #include "FlashComponent.h"
+#include "EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -24,8 +25,17 @@ void AEnemyCharacter::BeginPlay()
 
 void AEnemyCharacter::InitializeEnemy()
 {
+	if (GetController<AEnemyAIController>()) {
+		AIController = GetController<AEnemyAIController>();
+	}
+	else {
+		AIController = GetWorld()->SpawnActor<AEnemyAIController>();
+		AIController->Possess(this);
+	}
+	AIController->SetSightSenseValues(EnemyData->SightRadius);
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
 	currentHealth = EnemyData->Health;
+	bIsDead = true;
 }
 
 // Called every frame
@@ -54,8 +64,8 @@ void AEnemyCharacter::Damage(float damageToTake)
 	}
 	currentHealth -= damageToTake;
 	if (currentHealth <= 0) {
-		//despawn enemy
 		currentHealth = 0;
+		OnDespawn();
 	}
 }
 
@@ -63,4 +73,24 @@ float AEnemyCharacter::GetHealth()
 {
 	return currentHealth;
 }
+
+void AEnemyCharacter::OnSpawn()
+{
+	bIsDead = false;
+	if (AIController)
+	AIController->SetIsDead(bIsDead);
+}
+
+void AEnemyCharacter::OnDespawn()
+{
+	bIsDead = true;
+	if(AIController)
+	AIController->SetIsDead(bIsDead);
+}
+
+bool AEnemyCharacter::CanSpawn()
+{
+	return bIsDead;
+}
+
 

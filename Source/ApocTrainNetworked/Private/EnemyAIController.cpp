@@ -52,3 +52,16 @@ void AEnemyAIController::OnTargetDetected(AActor* Actor, FAIStimulus const Stimu
 		GetBlackboardComponent()->SetValueAsBool("CanSeePlayer", Stimulus.WasSuccessfullySensed());
 	}
 }
+
+void AEnemyAIController::SetIsDead(bool isDead)
+{
+	GetBlackboardComponent()->SetValueAsBool("Dead", isDead);
+}
+
+void AEnemyAIController::SetSightSenseValues(float SightRadius)
+{
+	if (SightConfig) {
+		SightConfig->SightRadius = SightRadius;
+		GetPerceptionComponent()->ConfigureSense(*SightConfig);
+	}
+}

@@ -18,6 +18,10 @@ class APOCTRAINNETWORKED_API AEnemyAIController : public AAIController
 public:
 	explicit AEnemyAIController(FObjectInitializer const& ObjectInitializer);
 
+	void SetIsDead(bool isDead);
+
+	void SetSightSenseValues(float SightRadius);
+
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
@@ -27,4 +31,5 @@ protected:
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* Actor, FAIStimulus const Stimulus);
+
 };
