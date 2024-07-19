@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void GetMeshesToPulse();
-	TArray<UStaticMeshComponent*> pulseMeshes;
+	TArray<UMeshComponent*> pulseMeshes;
 	TArray<FVector> startingScales;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timeline")

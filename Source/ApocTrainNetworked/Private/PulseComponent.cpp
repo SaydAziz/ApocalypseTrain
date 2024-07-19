@@ -37,14 +37,14 @@ void UPulseComponent::GetMeshesToPulse()
 {
 	TSet<UActorComponent*> components = GetOwner()->GetComponents();
 	for (UActorComponent* component : components) {
-		if (UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(component)) {
+		if (UMeshComponent* mesh = Cast<UMeshComponent>(component)) {
 			if (mesh->ComponentHasTag("Pulse")) {
 				mesh->SetIsReplicated(true);
 				pulseMeshes.Add(mesh);
 			}
 		}
 	}
-	for (UStaticMeshComponent* mesh : pulseMeshes) {
+	for (UMeshComponent* mesh : pulseMeshes) {
 		startingScales.Add(mesh->GetComponentScale());
 	}
 }

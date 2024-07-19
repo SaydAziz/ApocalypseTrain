@@ -64,7 +64,7 @@ void AProjectileWeapon::Attack()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
 		{
 			if (HitResult.GetActor()) {
-
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
 				if (IDamagable* damagableActor = Cast<IDamagable>(HitResult.GetActor())) {
 					damagableActor->Damage(Data->Damage);
 				}
