@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ChunkSpawner.generated.h"
 
+DECLARE_DELEGATE_OneParam(FChunkSpawned, float);
 
 UCLASS()
 class APOCTRAINNETWORKED_API AChunkSpawner : public AActor
@@ -47,4 +48,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TSubclassOf<class ALevelChunk> > LevelChunks;
 	
+	FChunkSpawned OnChunkSpawned;
 };

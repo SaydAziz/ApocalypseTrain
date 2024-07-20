@@ -57,7 +57,7 @@ public:
 	virtual float GetHealth();
 
 	// Inherited via IPoolable
-	void OnSpawn() override;
+	void OnSpawn(FVector SpawnLocation) override;
 
 	void OnDespawn() override;
 

@@ -23,12 +23,19 @@ void AObjectPooler::BeginPlay()
 
 void AObjectPooler::CreateObjects()
 {
-	for (int i = 0; i < TotalObjects; i++) {
-		AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X,InitialPos.Y,InitialPos.Z), new FRotator(), FActorSpawnParameters());
-		if (IPoolable* pooledObject = Cast<IPoolable>(obj)) {
-			Pool.Enqueue(pooledObject);
+	if (ObjectType) {
+		for (int i = 0; i < TotalObjects; i++) {
+			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y, InitialPos.Z), new FRotator(), FActorSpawnParameters());
+			if (IPoolable* pooledObject = Cast<IPoolable>(obj)) {
+				Pool.Enqueue(pooledObject);
+			}
 		}
 	}
+}
+
+FVector AObjectPooler::GetSpawnLocation()
+{
+	return FVector();
 }
 
 // Called every frame
@@ -38,15 +45,24 @@ void AObjectPooler::Tick(float DeltaTime)
 
 }
 
-void AObjectPooler::SpawnObject()
+void AObjectPooler::SpawnObject(FVector SpawnLocation)
 {
 	if (HasAuthority()) {
 		if (!Pool.IsEmpty() && (*Pool.Peek())->CanSpawn()) {
 			IPoolable* pooledObject;
 			Pool.Dequeue(pooledObject);
-			pooledObject->OnSpawn();
+			pooledObject->OnSpawn(SpawnLocation);
 			Pool.Enqueue(pooledObject);
 		}
+	}
+}
+
+void AObjectPooler::InitializePoolerFromSpawn(TSubclassOf<AActor> Type, int Total)
+{
+	ObjectType = Type;
+	TotalObjects = Total;
+	if (HasAuthority()) {
+		CreateObjects();
 	}
 }
 

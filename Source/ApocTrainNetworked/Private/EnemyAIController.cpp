@@ -56,6 +56,12 @@ void AEnemyAIController::OnTargetDetected(AActor* Actor, FAIStimulus const Stimu
 void AEnemyAIController::SetIsDead(bool isDead)
 {
 	GetBlackboardComponent()->SetValueAsBool("Dead", isDead);
+	if (isDead) {
+		GetBrainComponent()->StopLogic("AI Died");
+	}
+	else {
+		GetBrainComponent()->StartLogic();
+	}
 }
 
 void AEnemyAIController::SetSightSenseValues(float SightRadius)

@@ -76,7 +76,6 @@ float AEnemyCharacter::GetHealth()
 
 void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
 {
-	currentHealth = EnemyData->Health;
 	bIsDead = false;
 	GetCharacterMovement()->GravityScale = 1;
 	SetActorLocation(SpawnLocation);

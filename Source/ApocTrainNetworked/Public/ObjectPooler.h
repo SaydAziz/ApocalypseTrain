@@ -34,13 +34,15 @@ protected:
 
 	void CreateObjects();
 
-
+	FVector GetSpawnLocation();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void SpawnObject();
+	virtual void SpawnObject(FVector SpawnLocation);
+
+	virtual void InitializePoolerFromSpawn(TSubclassOf<AActor> Type, int Total);
 
 };

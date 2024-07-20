@@ -24,7 +24,7 @@ class APOCTRAINNETWORKED_API IPoolable
 public:
 
 
-	virtual void OnSpawn() = 0;
+	virtual void OnSpawn(FVector spawnLocation) = 0;
 
 	virtual void OnDespawn() = 0;
 

@@ -29,6 +29,7 @@ void AChunkSpawner::SpawnNewChunk()
 	int chunkIndex = FMath::RandRange(0,LevelChunks.Num()-1);
 	ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(LevelChunks[chunkIndex],new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
 	RelocateNavMesh(FVector(0,targetPostion - navMeshOffset,0));
+	OnChunkSpawned.ExecuteIfBound(targetPostion);
 	targetPostion += chunk->GetChunkLength();
 }
 
