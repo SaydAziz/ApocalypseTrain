@@ -75,7 +75,7 @@ protected:
 
 	void SetPlayerActionState(EPlayerActionState NewActionState);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
 	float throwVelocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Weapon)

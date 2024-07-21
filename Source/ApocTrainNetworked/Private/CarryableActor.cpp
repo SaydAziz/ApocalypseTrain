@@ -14,9 +14,9 @@ void ACarryableActor::BeginPlay()
 void ACarryableActor::OnInteract(APlayerCharacter* player)
 {
 	if (!player->IsCarryingItem()) {
+		carriedState = ECarriedState::Carried;
 		player->Server_PickupItem(this);
 		LastCarryingPlayer = player;
-		carriedState = ECarriedState::Carried;
 	}
 }
 

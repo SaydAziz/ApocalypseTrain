@@ -154,7 +154,6 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 			}
 		}
 		SetPlayerActionState(EPlayerActionState::idle);
-		
 	}
 }
 
