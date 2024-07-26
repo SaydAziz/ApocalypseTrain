@@ -16,14 +16,12 @@ AObjectPooler::AObjectPooler()
 void AObjectPooler::BeginPlay()
 {
 	Super::BeginPlay();
-	if (HasAuthority()) {
-		CreateObjects();
-	}
+	CreateObjects();
 }
 
 void AObjectPooler::CreateObjects()
 {
-	if (ObjectType) {
+	if (ObjectType && HasAuthority()) {
 		for (int i = 0; i < TotalObjects; i++) {
 			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y, InitialPos.Z), new FRotator(), FActorSpawnParameters());
 			if (IPoolable* pooledObject = Cast<IPoolable>(obj)) {
@@ -61,8 +59,6 @@ void AObjectPooler::InitializePoolerFromSpawn(TSubclassOf<AActor> Type, int Tota
 {
 	ObjectType = Type;
 	TotalObjects = Total;
-	if (HasAuthority()) {
-		CreateObjects();
-	}
+	CreateObjects();
 }
 

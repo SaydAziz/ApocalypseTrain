@@ -18,7 +18,6 @@ AEnemySpawnManager::AEnemySpawnManager()
 void AEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
 	AChunkSpawner* chunkSpawnManager = CustomUtils::GetFirstActorOfClass<AChunkSpawner>(GetWorld());
 	if(chunkSpawnManager)
 		chunkSpawnManager->OnChunkSpawned.BindUObject(this, &AEnemySpawnManager::SpawnEnemiesOnChunk);
@@ -27,23 +26,19 @@ void AEnemySpawnManager::BeginPlay()
 
 void AEnemySpawnManager::SpawnEnemiesOnChunk(float Ypos)
 {
-	if (HasAuthority()) {
-		for (AObjectPooler* p : EnemyPools) {
-			for (int i = 0; i < EnemiesPerChunk; i++) {
-				p->SpawnObject(FVector(0, Ypos, 0));
-			}
+	for (AObjectPooler* p : EnemyPools) {
+		for (int i = 0; i < EnemiesPerChunk; i++) {
+			p->SpawnObject(FVector(0,Ypos,0));
 		}
 	}
 }
 
 void AEnemySpawnManager::CreateEnemyPools()
 {
-	if (HasAuthority()) {
-		for (FEnemySpawnData e : SpawnData) {
-			AObjectPooler* p = GetWorld()->SpawnActor<AObjectPooler>();
-			p->InitializePoolerFromSpawn(e.enemyType, e.TotalEnemies);
-			EnemyPools.Add(p);
-		}
+	for (FEnemySpawnData e : SpawnData) {
+		AObjectPooler* p = GetWorld()->SpawnActor<AObjectPooler>();
+		p->InitializePoolerFromSpawn(e.enemyType, e.TotalEnemies);
+		EnemyPools.Add(p);
 	}
 }
 
