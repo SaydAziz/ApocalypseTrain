@@ -28,7 +28,7 @@ void UFlashComponent::GetMaterialsToFlash()
 {
 	TSet<UActorComponent*> components = GetOwner()->GetComponents();
 	for (UActorComponent* component : components) {
-		if (UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(component)) {
+		if (UMeshComponent* mesh = Cast<UMeshComponent>(component)) {
 			if (mesh->ComponentHasTag("Flash")) {
 				mesh->SetIsReplicated(true);
 				UMaterialInterface* baseMat = mesh->GetMaterial(0);

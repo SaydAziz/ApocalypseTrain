@@ -9,6 +9,8 @@
 #include "CarryableActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -26,6 +28,15 @@ APlayerCharacter::APlayerCharacter()
 	DashImpulseStrength = 2000.0f;
 	DashCooldown = 1.0f;
 	bCanDash = true;
+}
+
+void APlayerCharacter::SetupStimulusSource()
+{
+	StimulusSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus"));
+	if (StimulusSource) {
+		StimulusSource->RegisterForSense(TSubclassOf<UAISense_Sight>());
+		StimulusSource->RegisterWithPerceptionSystem();
+	}
 }
 
 // Called when the game starts or when spawned
@@ -143,7 +154,6 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 			}
 		}
 		SetPlayerActionState(EPlayerActionState::idle);
-		
 	}
 }
 

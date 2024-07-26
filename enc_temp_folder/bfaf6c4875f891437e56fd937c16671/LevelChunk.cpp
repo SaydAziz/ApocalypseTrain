@@ -15,7 +15,6 @@ ALevelChunk::ALevelChunk()
 void ALevelChunk::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
 	TSet<UActorComponent*> components = GetComponents();
 	for (UActorComponent* Component : components)
 	{

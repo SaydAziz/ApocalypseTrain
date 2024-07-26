@@ -64,3 +64,18 @@ bool APlayerManager::IsOverlappingPlayerWithFuel(UBoxComponent* box)
 	}
 	return false;
 }
+
+APlayerCharacter* APlayerManager::GetClosestPlayer(FVector location)
+{
+	APlayerCharacter* closestPlayer = nullptr;
+	if (ActivePlayers.Num() > 0) {
+
+		closestPlayer = ActivePlayers[0];
+		for (APlayerCharacter* p : ActivePlayers) {
+			if (FVector::Dist(p->GetActorLocation(), location) < FVector::Dist(closestPlayer->GetActorLocation(), location)) {
+				closestPlayer = p;
+			}
+		}
+	}
+	return closestPlayer;
+}
