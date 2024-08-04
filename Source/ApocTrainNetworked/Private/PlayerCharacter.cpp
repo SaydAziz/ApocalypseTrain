@@ -288,18 +288,19 @@ void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
 void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 {
-	if (EquippedWeapon)
-	{
-		EquippedWeapon->Destroy();
-	}
 
-	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-	EquippedWeapon = Weapon;
-	EquippedWeapon->AttachToActor(this, AttachmentRules);
-	EquippedWeapon->Equip();
-	EquippedWeapon->SetOwner(this);
-	
-	
+	if (Weapon->GetAttachParentActor() == nullptr)
+	{
+		if (EquippedWeapon)
+		{
+			EquippedWeapon->Destroy();
+		}
+		FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+		EquippedWeapon = Weapon;
+		EquippedWeapon->AttachToActor(this, AttachmentRules);
+		EquippedWeapon->Equip();
+		EquippedWeapon->SetOwner(this);
+	}
 }
 
 void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)
