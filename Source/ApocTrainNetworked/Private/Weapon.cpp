@@ -56,5 +56,7 @@ void AWeapon::Server_Attack_Implementation()
 
 void AWeapon::Equip()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("EQUIPPED"));
+	PickUpTrigger->SetActive(false);
 }
 

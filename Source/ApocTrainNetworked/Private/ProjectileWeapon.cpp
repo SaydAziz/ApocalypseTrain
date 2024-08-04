@@ -100,6 +100,7 @@ void AProjectileWeapon::Server_Attack_Implementation()
 
 void AProjectileWeapon::Equip()
 {
+	Super::Equip();
 }
 
 void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
