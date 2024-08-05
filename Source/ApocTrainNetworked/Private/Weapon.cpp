@@ -58,5 +58,11 @@ void AWeapon::Equip()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("EQUIPPED"));
 	PickUpTrigger->SetActive(false);
+	Highlight(false);
+}
+
+void AWeapon::Highlight(bool val)
+{
+	WeaponMesh->SetRenderCustomDepth(val);
 }
 
