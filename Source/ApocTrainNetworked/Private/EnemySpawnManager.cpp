@@ -6,6 +6,7 @@
 #include "ChunkSpawner.h"
 #include "ObjectPooler.h"
 #include <ATGameState.h>
+#include "EnemyData.h"
 
 // Sets default values
 AEnemySpawnManager::AEnemySpawnManager()
@@ -21,6 +22,7 @@ void AEnemySpawnManager::BeginPlay()
 	Super::BeginPlay();
 	SetReplicates(true);
 	GetWorld()->GetGameState<AATGameState>()->OnSpawnEnemies.AddDynamic(this, &AEnemySpawnManager::SpawnEnemiesOnChunk);
+	GetWorld()->GetGameState<AATGameState>()->OnDifficultyIncrease.AddDynamic(this, &AEnemySpawnManager::IncreaseDifficulty);
 	CreateEnemyPools();
 }
 
@@ -32,6 +34,13 @@ void AEnemySpawnManager::SpawnEnemiesOnChunk(float Ypos)
 				p->SpawnObject(FVector(0, Ypos, 0));
 			}
 		}
+	}
+}
+
+void AEnemySpawnManager::IncreaseDifficulty()
+{
+	for (UEnemyData* data : EnemyDataList) {
+		data->IncreaseDifficulty();
 	}
 }
 

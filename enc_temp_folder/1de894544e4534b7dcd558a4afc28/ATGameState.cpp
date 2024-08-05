@@ -15,9 +15,7 @@ APlayerManager* AATGameState::GetPlayerManager()
 void AATGameState::OnChunkSpawned(FSpawnedChunkInfo info)
 {
 	OnSpawnEnemies.Broadcast(info.YPos);
-	if (info.bIsEncounter) {
-		OnDifficultyIncrease.Broadcast();
-	}
+	OnDifficultyIncrease.Broadcast();
 }
 
 

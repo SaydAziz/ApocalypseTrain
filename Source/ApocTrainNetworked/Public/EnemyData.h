@@ -29,6 +29,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	float SightRadius;
+
+	void IncreaseDifficulty();
 	
 };
 

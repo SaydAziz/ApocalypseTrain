@@ -100,4 +100,9 @@ bool AEnemyCharacter::CanSpawn()
 	return bIsDead;
 }
 
+void AEnemyCharacter::IncreaseEnemyDifficulty()
+{
+
+}
+
 
