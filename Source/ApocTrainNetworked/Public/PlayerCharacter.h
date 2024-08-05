@@ -9,13 +9,13 @@
 #include "Components/CapsuleComponent.h"
 #include "PlayerCharacter.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPlayerMovementState : uint8
 {
 	standing UMETA(DisplayName = "Standing"), walking UMETA(DisplayName = "Walking"), dashing UMETA(DisplayName = "Dashing")
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPlayerActionState : uint8
 {
 	idle UMETA(DisplayName = "Idle"), attacking UMETA(DisplayName = "Attacking"), carrying UMETA(DisplayName = "Carrying")
@@ -66,11 +66,13 @@ public:
 protected:
 
 	//PLAYER STATE
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EPlayerMovementState CurrentMovementState;
 
 	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
 
 	//INTERACT MECHANICS
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EPlayerActionState CurrentActionState;
 
 	void SetPlayerActionState(EPlayerActionState NewActionState);
