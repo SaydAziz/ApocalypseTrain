@@ -58,6 +58,8 @@ void AWeapon::Equip()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("EQUIPPED"));
 	PickUpTrigger->SetActive(false);
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMesh->SetGenerateOverlapEvents(false);
 	Highlight(false);
 }
 

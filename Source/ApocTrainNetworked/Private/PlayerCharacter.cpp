@@ -272,16 +272,22 @@ void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 
 void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(AWeapon::StaticClass()))
+	if (OtherActor->IsA(AWeapon::StaticClass()) )
 	{
-		WeaponOnGround = Cast<AWeapon>(OtherActor);
-		WeaponOnGround->Highlight(true);
+		if (OtherActor != EquippedWeapon)
+		{
+			WeaponOnGround = Cast<AWeapon>(OtherActor);
+			if (WeaponOnGround)
+			{
+				WeaponOnGround->Highlight(true);
+			}
+		}
 	}
 }
 
 void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->IsA(AWeapon::StaticClass()))
+	if (OtherActor == WeaponOnGround)
 	{
 		WeaponOnGround->Highlight(false);
 		WeaponOnGround = NULL;
