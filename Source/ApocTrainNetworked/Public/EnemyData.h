@@ -31,3 +31,6 @@ public:
 	float SightRadius;
 	
 };
+
+
+//enemeis subscribe to level up event chunk spawning after certain number send out level up event, go through GameState

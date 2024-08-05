@@ -3,10 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Actor.h"
 #include "ChunkSpawner.generated.h"
 
-DECLARE_DELEGATE_OneParam(FChunkSpawned, float);
+USTRUCT(BlueprintType)
+struct FSpawnedChunkInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Location")
+	float YPos;
+
+};
+
+DECLARE_DELEGATE_OneParam(FChunkSpawned, FSpawnedChunkInfo);
 
 UCLASS()
 class APOCTRAINNETWORKED_API AChunkSpawner : public AActor

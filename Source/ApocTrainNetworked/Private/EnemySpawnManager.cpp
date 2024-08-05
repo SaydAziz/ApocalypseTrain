@@ -5,6 +5,7 @@
 #include "CustomUtils.h"
 #include "ChunkSpawner.h"
 #include "ObjectPooler.h"
+#include <ATGameState.h>
 
 // Sets default values
 AEnemySpawnManager::AEnemySpawnManager()
@@ -19,9 +20,7 @@ void AEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	SetReplicates(true);
-	AChunkSpawner* chunkSpawnManager = CustomUtils::GetFirstActorOfClass<AChunkSpawner>(GetWorld());
-	if(chunkSpawnManager)
-		chunkSpawnManager->OnChunkSpawned.BindUObject(this, &AEnemySpawnManager::SpawnEnemiesOnChunk);
+	GetWorld()->GetGameState<AATGameState>()->OnSpawnEnemies.AddDynamic(this, &AEnemySpawnManager::SpawnEnemiesOnChunk);
 	CreateEnemyPools();
 }
 

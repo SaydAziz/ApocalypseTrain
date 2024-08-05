@@ -29,6 +29,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
 	void SpawnEnemiesOnChunk(float Ypos);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -3,10 +3,19 @@
 
 #include "ATGameState.h"
 #include "PlayerManager.h"
+#include "ChunkSpawner.h"
 #include "PlayerCharacter.h"
 
 APlayerManager* AATGameState::GetPlayerManager()
 {
 	return playerManager;
 }
+
+void AATGameState::OnChunkSpawned(FSpawnedChunkInfo info)
+{
+	OnSpawnEnemies.Broadcast(info.YPos);
+}
+
+
+
 

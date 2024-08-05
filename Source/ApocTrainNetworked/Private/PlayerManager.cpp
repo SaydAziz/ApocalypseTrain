@@ -5,7 +5,9 @@
 #include "PlayerCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "CustomUtils.h"
 #include <Kismet/KismetMathLibrary.h>
+#include <Train.h>
 
 // Sets default values
 APlayerManager::APlayerManager()
@@ -24,7 +26,7 @@ void APlayerManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void APlayerManager::BeginPlay()
 {
 	Super::BeginPlay();
-
+	train = CustomUtils::GetFirstActorOfClass<ATrain>(GetWorld());
 }
 
 // Called every frame
@@ -79,3 +81,17 @@ APlayerCharacter* APlayerManager::GetClosestPlayer(FVector location)
 	}
 	return closestPlayer;
 }
+
+FVector APlayerManager::GetPlayerSpawnPoint()
+{
+	FVector pos = SpawnOffset; 
+	float x = FMath::RandRange(-500, 500);
+	pos.X += x;
+	if(train)
+	{
+		pos.Y += train->GetActorLocation().Y;
+	}
+	return pos;
+}
+
+
