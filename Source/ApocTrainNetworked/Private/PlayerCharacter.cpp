@@ -275,6 +275,7 @@ void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	if (OtherActor->IsA(AWeapon::StaticClass()))
 	{
 		WeaponOnGround = Cast<AWeapon>(OtherActor);
+		WeaponOnGround->Highlight(true);
 	}
 }
 
@@ -282,6 +283,7 @@ void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 {
 	if (OtherActor->IsA(AWeapon::StaticClass()))
 	{
+		WeaponOnGround->Highlight(false);
 		WeaponOnGround = NULL;
 	}
 }

@@ -48,6 +48,7 @@ public:
 	virtual void Attack();
 	virtual void StopAttack();
 	virtual void ResetAttack();
+	void Highlight(bool val);
 
 	UFUNCTION(Server, Reliable)
 	virtual void Server_Attack();
