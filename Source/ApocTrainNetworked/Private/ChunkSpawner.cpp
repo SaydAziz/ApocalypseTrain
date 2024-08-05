@@ -11,7 +11,7 @@
 // Sets default values
 AChunkSpawner::AChunkSpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -26,11 +26,13 @@ void AChunkSpawner::BeginPlay()
 
 void AChunkSpawner::SpawnNewChunk()
 {
-	int chunkIndex = FMath::RandRange(0,LevelChunks.Num()-1);
-	ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(LevelChunks[chunkIndex],new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
-	RelocateNavMesh(FVector(0,targetPostion - navMeshOffset,0));
-	OnChunkSpawned.ExecuteIfBound(targetPostion);
-	targetPostion += chunk->GetChunkLength();
+	if (HasAuthority()) {
+		int chunkIndex = FMath::RandRange(0, LevelChunks.Num() - 1);
+		ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(LevelChunks[chunkIndex], new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+		RelocateNavMesh(FVector(0, targetPostion - navMeshOffset, 0));
+		OnChunkSpawned.ExecuteIfBound(targetPostion);
+		targetPostion += chunk->GetChunkLength();
+	}
 }
 
 bool AChunkSpawner::TargetReached()
@@ -64,4 +66,3 @@ void AChunkSpawner::RelocateNavMesh(FVector newLocation)
 		}
 	}
 }
-
