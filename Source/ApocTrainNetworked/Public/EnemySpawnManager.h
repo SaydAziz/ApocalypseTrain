@@ -44,6 +44,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EnemiesPerChunk;
 
+	void ResetEnemyData();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
