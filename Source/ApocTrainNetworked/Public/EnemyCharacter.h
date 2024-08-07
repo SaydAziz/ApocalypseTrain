@@ -63,4 +63,6 @@ public:
 
 	bool CanSpawn() override;
 
+	void IncreaseEnemyDifficulty();
+
 };

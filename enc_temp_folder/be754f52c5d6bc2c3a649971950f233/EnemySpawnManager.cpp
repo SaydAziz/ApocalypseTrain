@@ -21,7 +21,6 @@ void AEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	SetReplicates(true);
-	ResetEnemyData();
 	GetWorld()->GetGameState<AATGameState>()->OnSpawnEnemies.AddDynamic(this, &AEnemySpawnManager::SpawnEnemiesOnChunk);
 	GetWorld()->GetGameState<AATGameState>()->OnDifficultyIncrease.AddDynamic(this, &AEnemySpawnManager::IncreaseDifficulty);
 	CreateEnemyPools();
@@ -53,13 +52,6 @@ void AEnemySpawnManager::CreateEnemyPools()
 			p->InitializePoolerFromSpawn(e.enemyType, e.TotalEnemies);
 			EnemyPools.Add(p);
 		}
-	}
-}
-
-void AEnemySpawnManager::ResetEnemyData()
-{
-	for (UEnemyData* e : EnemyDataList) {
-		e->ResetValues();
 	}
 }
 

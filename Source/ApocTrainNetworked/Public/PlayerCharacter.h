@@ -62,7 +62,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int PlayerIndex;
 
-
 protected:
 
 	//PLAYER STATE

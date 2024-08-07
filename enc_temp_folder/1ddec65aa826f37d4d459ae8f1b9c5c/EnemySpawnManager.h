@@ -39,12 +39,12 @@ protected:
 
 	TArray<class AObjectPooler*> EnemyPools;
 
+	TArray<class AEnemyCharacter*> AllEnemies;
+
 	void CreateEnemyPools();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EnemiesPerChunk;
-
-	void ResetEnemyData();
 
 public:	
 	// Called every frame
