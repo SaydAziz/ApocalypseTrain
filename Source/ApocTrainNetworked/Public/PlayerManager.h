@@ -23,6 +23,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	class ATrain* train;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -33,8 +35,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FColor> PlayerColors;
 
-	UFUNCTION(BlueprintCallable)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Spawning")
+	FVector SpawnOffset;
 
+	UFUNCTION(BlueprintCallable)
 	int RegisterPlayerWithManager(class APlayerCharacter* joinedPlayer);
 
 	bool IsOverlappingPlayer(class UBoxComponent* box);
@@ -42,5 +46,9 @@ public:
 	bool IsOverlappingPlayerWithFuel(class UBoxComponent* box);
 
 	APlayerCharacter* GetClosestPlayer(FVector location);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetPlayerSpawnPoint();
+
 
 };

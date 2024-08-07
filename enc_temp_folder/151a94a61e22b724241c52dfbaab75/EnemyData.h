@@ -15,10 +15,6 @@ class APOCTRAINNETWORKED_API UEnemyData : public UDataAsset
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	UEnemyData* BaseDataAsset;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float AttackRate;
 
@@ -35,8 +31,6 @@ public:
 	float SightRadius;
 
 	void IncreaseDifficulty();
-
-	void ResetValues();
 	
 };
 

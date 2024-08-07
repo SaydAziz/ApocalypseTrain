@@ -59,7 +59,6 @@ UBehaviorTree* AEnemyCharacter::GetBehaviorTree() const
 
 void AEnemyCharacter::Damage(float damageToTake)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("currentyHealth %f"), currentHealth));
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}
