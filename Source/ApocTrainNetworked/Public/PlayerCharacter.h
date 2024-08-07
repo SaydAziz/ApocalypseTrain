@@ -69,6 +69,8 @@ protected:
 	EPlayerMovementState CurrentMovementState;
 
 	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	EPlayerMovementState GetPlayerMovementState() const;
 
 	//INTERACT MECHANICS
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

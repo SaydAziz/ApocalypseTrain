@@ -323,6 +323,11 @@ void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementSt
 
 }
 
+EPlayerMovementState APlayerCharacter::GetPlayerMovementState() const
+{
+	return CurrentMovementState;
+}
+
 void APlayerCharacter::SetPlayerActionState(EPlayerActionState NewActionState)
 {
 	if (CurrentActionState != NewActionState) {
