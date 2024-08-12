@@ -68,6 +68,4 @@ public:
 	float GetAttackRadius();
 
 	void ExecuteMeleeAttack();
-
-	bool CanAttack();
 };
