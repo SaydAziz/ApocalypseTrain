@@ -2,7 +2,7 @@
 
 
 #include "ChunkSpawner.h"
-#include "LevelChunk.h"
+#include "EncounterChunk.h"
 #include "CustomUtils.h"
 #include <Train.h>
 #include "NavMesh/NavMeshBoundsVolume.h"
@@ -23,35 +23,29 @@ void AChunkSpawner::BeginPlay()
 	Super::BeginPlay();
 	SetLeadingActor(CustomUtils::GetFirstActorOfClass<ATrain>(GetWorld()));
 	NavMeshBounds = CustomUtils::GetFirstActorOfClass<ANavMeshBoundsVolume>(GetWorld());
-	AATGameState* gameState = GetWorld()->GetGameState<AATGameState>();
+	gameState = GetWorld()->GetGameState<AATGameState>();
 	OnChunkSpawned.BindUObject(gameState, &AATGameState::OnChunkSpawned);
 }
 
 void AChunkSpawner::SpawnNewChunk()
 {
 	if (HasAuthority()) {
-		
-		ALevelChunk* chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(GetChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+		ALevelChunk* chunk;
+		if (TotalChunksSpawned > 1 && TotalChunksSpawned % EncounterSpawnFrequency == 0) {
+			chunk = Cast<AEncounterChunk>(GetWorld()->SpawnActor(GetEncounterChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+		}
+		else {
+			chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(GetRegularChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+		}
 		RelocateNavMesh(FVector(0, targetPostion - navMeshOffset, 0));
 		FSpawnedChunkInfo info = FSpawnedChunkInfo();
 		info.YPos = targetPostion;
-		//refactor later to just check if level chunk is encounter chunk
-		if (TotalChunksSpawned > 1 && TotalChunksSpawned % EncounterSpawnFrequency == 0) {
-			info.bIsEncounter = true;
-		}
 		OnChunkSpawned.ExecuteIfBound(info);
 		targetPostion += chunk->GetChunkLength();
 		TotalChunksSpawned++;
 	}
 }
 
-TSubclassOf<ALevelChunk> AChunkSpawner::GetChunkType()
-{
-	if (TotalChunksSpawned > 1 && TotalChunksSpawned % EncounterSpawnFrequency == 0) {
-		return GetEncounterChunkType();
-	}
-	return GetRegularChunkType();
-}
 
 TSubclassOf<ALevelChunk> AChunkSpawner::GetRegularChunkType()
 {
@@ -63,7 +57,7 @@ TSubclassOf<ALevelChunk> AChunkSpawner::GetRegularChunkType()
 	return LevelChunks[chunkIndex];
 }
 
-TSubclassOf<ALevelChunk> AChunkSpawner::GetEncounterChunkType()
+TSubclassOf<AEncounterChunk> AChunkSpawner::GetEncounterChunkType()
 {
 	int chunkIndex = FMath::RandRange(0, EncounterChunks.Num() - 1);
 	while (EncounterChunks.Num() > 1 && chunkIndex == prevEncounterChunkIndex) {

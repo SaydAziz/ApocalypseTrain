@@ -15,9 +15,22 @@ APlayerManager* AATGameState::GetPlayerManager()
 void AATGameState::OnChunkSpawned(FSpawnedChunkInfo info)
 {
 	OnSpawnEnemies.Broadcast(info.YPos);
-	if (info.bIsEncounter) {
-		OnDifficultyIncrease.Broadcast();
+}
+
+void AATGameState::SetGameState(EGameState stateToSet)
+{
+	switch (stateToSet) {
+		case EGameState::Encounter:
+			break;
+		case EGameState::lobby:
+			break;
+		case EGameState::traveling:
+			if (CurrentGameState == EGameState::Encounter) {
+				OnDifficultyIncrease.Broadcast();
+			}
+			break;
 	}
+	CurrentGameState = stateToSet;
 }
 
 

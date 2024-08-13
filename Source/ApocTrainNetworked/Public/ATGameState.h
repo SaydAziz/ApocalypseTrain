@@ -34,6 +34,9 @@ public:
 	UFUNCTION()
 	void OnChunkSpawned(struct FSpawnedChunkInfo info);
 
+	UFUNCTION(BlueprintCallable)
+	void SetGameState(EGameState stateToSet);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EGameState CurrentGameState;
 

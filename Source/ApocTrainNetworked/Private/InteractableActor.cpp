@@ -90,12 +90,13 @@ void AInteractableActor::CheckForInteractPressed()
 
 void AInteractableActor::OnInteract(APlayerCharacter* player)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString(TEXT("INTERACTING WITH YOUR MOM")));
+	OnInteracted();
+	//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString(TEXT("INTERACTING WITH YOUR MOM")));
 }
 
 bool AInteractableActor::CurrentlyInteractable()
 {
-	return false;
+	return true;
 }
 
 bool AInteractableActor::CanPlayerInteract(APlayerCharacter* player)

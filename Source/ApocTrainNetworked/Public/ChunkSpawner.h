@@ -15,12 +15,11 @@ struct FSpawnedChunkInfo
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Location")
 	float YPos;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Chunktype")
-	bool bIsEncounter;
 
 };
 
 class ALevelChunk;
+class AEncounterChunk;
 
 DECLARE_DELEGATE_OneParam(FChunkSpawned, FSpawnedChunkInfo);
 
@@ -34,6 +33,8 @@ public:
 	AChunkSpawner();
 
 protected:
+
+	class AATGameState* gameState;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -55,10 +56,8 @@ protected:
 	int prevChunkIndex;
 	int prevEncounterChunkIndex;
 
-	TSubclassOf<ALevelChunk> GetChunkType();
-
 	TSubclassOf<ALevelChunk> GetRegularChunkType();
-	TSubclassOf<ALevelChunk> GetEncounterChunkType();
+	TSubclassOf<AEncounterChunk> GetEncounterChunkType();
 
 	bool TargetReached();
 
@@ -78,7 +77,7 @@ public:
 	TArray<TSubclassOf<class ALevelChunk> > LevelChunks;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TSubclassOf<class ALevelChunk> > EncounterChunks;
+	TArray<TSubclassOf<class AEncounterChunk> > EncounterChunks;
 	
 	FChunkSpawned OnChunkSpawned;
 };
