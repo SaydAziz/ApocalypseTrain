@@ -79,7 +79,7 @@ void AProjectileWeapon::Multicast_AttackEffects_Implementation()
 {
 	if (Data->BulletTracer)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation(), GetAttachParentActor()->GetActorForwardVector().Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, WeaponMesh->GetSocketLocation("MuzzleSocket"), GetAttachParentActor()->GetActorForwardVector().Rotation());
 	}
 }
 
