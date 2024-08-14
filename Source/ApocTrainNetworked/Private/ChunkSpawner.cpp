@@ -31,11 +31,11 @@ void AChunkSpawner::SpawnNewChunk()
 {
 	if (HasAuthority()) {
 		ALevelChunk* chunk;
-		if (TotalChunksSpawned > 1 && TotalChunksSpawned % EncounterSpawnFrequency == 0) {
-			chunk = Cast<AEncounterChunk>(GetWorld()->SpawnActor(GetEncounterChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+		if (TotalChunksSpawned <= 1 || TotalChunksSpawned % EncounterSpawnFrequency != 0) {
+			chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(GetRegularChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
 		}
 		else {
-			chunk = Cast<ALevelChunk>(GetWorld()->SpawnActor(GetRegularChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
+			chunk = Cast<AEncounterChunk>(GetWorld()->SpawnActor(GetEncounterChunkType(), new FVector(0, targetPostion, -40), new FRotator(), FActorSpawnParameters()));
 		}
 		RelocateNavMesh(FVector(0, targetPostion - navMeshOffset, 0));
 		FSpawnedChunkInfo info = FSpawnedChunkInfo();

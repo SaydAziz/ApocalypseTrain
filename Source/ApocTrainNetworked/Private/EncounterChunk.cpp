@@ -13,6 +13,7 @@ void AEncounterChunk::Tick(float DeltaTime)
 		if (train->GetActorLocation().Y >= GetActorLocation().Y - TriggerOffset) {
 			GetWorld()->GetGameState<AATGameState>()->SetGameState(EGameState::Encounter);
 			hasActivated = true;
+			SetActorTickEnabled(false);
 		}
 	}
 }
