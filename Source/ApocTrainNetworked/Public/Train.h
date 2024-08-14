@@ -26,7 +26,15 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetCurrentFuel();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetMaxFuel();
+
 protected:
+
+	class AATGameState* gameState;
 
 	bool isReversing;
 	UPROPERTY()
@@ -47,12 +55,18 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	void CheckGameState();
+
 	bool IsGameOverCountingDown();
 	void UpdateSpeed(float deltaTime);
 	void UpdateLocation(float DeltaTime);
 	void UpdateFuelComponent(float DeltaTime);
+
+	bool IsStopping();
 	UFUNCTION()
 	void SetTrainState(ETrainState stateToSet);
+	UFUNCTION()
+	void StopTrain();
 	UFUNCTION(BlueprintCallable)
 	void StartTrain();
 	UFUNCTION(BlueprintImplementableEvent)

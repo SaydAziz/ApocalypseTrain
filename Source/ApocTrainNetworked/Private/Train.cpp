@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "PulseComponent.h"
 #include "FlashComponent.h"
+#include <ATGameState.h>
 
 // Sets default values
 ATrain::ATrain()
@@ -20,15 +21,12 @@ ATrain::ATrain()
 	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
 }
 
-void ATrain::StartTrain()
-{
-	SetTrainState(ETrainState::accelerating);
-}
 
 // Called when the game starts or when spawned
 void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
+	gameState = GetWorld()->GetGameState<AATGameState>();
 }
 
 
@@ -42,6 +40,26 @@ void ATrain::Tick(float DeltaTime)
 		UpdateLocation(DeltaTime);
 	}
 	UpdateFuelComponent(DeltaTime);
+	CheckGameState();
+}
+
+void ATrain::CheckGameState()
+{
+	switch (gameState->CurrentGameState) {
+		case EGameState::lobby:
+			break;
+		case EGameState::traveling:
+			if (IsTrainStopped() || IsStopping()) {
+				StartTrain();
+			}
+			break;
+		case EGameState::Encounter:
+			if (!IsStopping()) {
+				StopTrain();
+			}
+			break;
+
+	}
 }
 
 
@@ -104,6 +122,11 @@ void ATrain::UpdateFuelComponent(float DeltaTime)
 }
 
 
+bool ATrain::IsStopping()
+{
+	return currentTrainState == ETrainState::decelerating;
+}
+
 void ATrain::SetTrainState(ETrainState stateToSet)
 {
 	switch (stateToSet) {
@@ -119,6 +142,16 @@ void ATrain::SetTrainState(ETrainState stateToSet)
 	currentTrainState = stateToSet;
 }
 
+void ATrain::StartTrain()
+{
+	SetTrainState(ETrainState::accelerating);
+}
+
+void ATrain::StopTrain()
+{
+	SetTrainState(ETrainState::decelerating);
+}
+
 bool ATrain::IsTrainStopped()
 {
 	if (currentTrainState == ETrainState::stopped) {
@@ -131,6 +164,16 @@ void ATrain::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+}
+
+float ATrain::GetCurrentFuel()
+{
+	return fuelComponent->CurrentFuel;
+}
+
+float ATrain::GetMaxFuel()
+{
+	return fuelComponent->MaxFuel;
 }
 
 bool ATrain::IsGameOverCountingDown()

@@ -20,7 +20,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	TArray<APlayerCharacter*> overlappingPlayers;
 	UPROPERTY(Replicated)
 	TArray<APlayerCharacter*> overlappingPlayersToRemove;
@@ -58,5 +58,8 @@ protected:
 	virtual bool CurrentlyInteractable();
 
 	virtual bool CanPlayerInteract(APlayerCharacter* player);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInteracted();
 
 };
