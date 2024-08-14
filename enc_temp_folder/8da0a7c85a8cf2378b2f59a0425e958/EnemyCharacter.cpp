@@ -113,12 +113,7 @@ float AEnemyCharacter::GetAttackRadius()
 
 void AEnemyCharacter::ExecuteMeleeAttack()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
-}
 
-bool AEnemyCharacter::CanAttack()
-{
-	return true;
 }
 
 

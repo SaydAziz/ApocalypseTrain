@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float AttackRate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float AttackRadius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float Damage;
