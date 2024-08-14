@@ -303,9 +303,12 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 		{
 			EquippedWeapon->Destroy();
 		}
-		FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+
+		FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, true);
+
 		EquippedWeapon = Weapon;
-		EquippedWeapon->AttachToActor(this, AttachmentRules);
+		EquippedWeapon->SetActorLocation(characterMesh->GetSocketTransform("WeaponSocket").GetLocation());
+		EquippedWeapon->AttachToComponent(characterMesh, AttachmentRules, "WeaponSocket");
 		EquippedWeapon->Equip();
 		EquippedWeapon->SetOwner(this);
 	}
