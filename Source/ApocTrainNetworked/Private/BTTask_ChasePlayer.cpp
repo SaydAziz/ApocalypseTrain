@@ -3,6 +3,7 @@
 
 #include "BTTask_ChasePlayer.h"
 #include "EnemyAIController.h"
+#include "EnemyCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
@@ -15,6 +16,10 @@ UBTTask_ChasePlayer::UBTTask_ChasePlayer(const FObjectInitializer& ObjectInitial
 EBTNodeResult::Type UBTTask_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	if (AEnemyAIController* controller = Cast<AEnemyAIController>(OwnerComp.GetAIOwner())) {
+		if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(controller->GetPawn()))
+		{
+			enemy->SetEnemyState(EEnemyState::chasing);
+		}
 		FVector const PlayerLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(GetSelectedBlackboardKey());
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(controller, PlayerLocation);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

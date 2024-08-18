@@ -36,6 +36,7 @@ void AEnemyCharacter::InitializeEnemy()
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
 	currentHealth = EnemyData->Health;
 	bIsDead = true;
+	CurrentState = EEnemyState::idle;
 }
 
 // Called every frame
@@ -59,7 +60,7 @@ UBehaviorTree* AEnemyCharacter::GetBehaviorTree() const
 
 void AEnemyCharacter::Damage(float damageToTake)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("currentyHealth %f"), currentHealth));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("current Health %f"), currentHealth));
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}
@@ -113,7 +114,8 @@ float AEnemyCharacter::GetAttackRadius()
 
 void AEnemyCharacter::ExecuteMeleeAttack()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
+	SetEnemyState(EEnemyState::attacking);
 }
 
 bool AEnemyCharacter::CanAttack()
@@ -121,4 +123,18 @@ bool AEnemyCharacter::CanAttack()
 	return true;
 }
 
+void AEnemyCharacter::SetEnemyState(EEnemyState NewState)
+{
+    if (CurrentState != NewState)
+    {
+        FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(NewState));
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
+        CurrentState = NewState;
+    }
+}
+
+EEnemyState AEnemyCharacter::GetEnemyState() const
+{
+	return CurrentState;
+}
 

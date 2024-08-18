@@ -12,6 +12,12 @@
 
 class AEnemyAIController;
 
+UENUM(BlueprintType)
+enum class EEnemyState: uint8
+{
+	idle UMETA(DisplayName = "Idle"), chasing UMETA(DisplayName = "Chasing"), attacking UMETA(DisplayName = "Attacking")
+};
+
 UCLASS()
 class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IDamagable, public IPoolable
 {
@@ -70,4 +76,13 @@ public:
 	void ExecuteMeleeAttack();
 
 	bool CanAttack();
+
+	//PLAYER STATE
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EEnemyState CurrentState;
+
+	void SetEnemyState(EEnemyState NewState);
+
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	EEnemyState GetEnemyState() const;
 };
