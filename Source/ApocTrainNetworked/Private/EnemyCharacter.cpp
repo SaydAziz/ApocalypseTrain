@@ -2,6 +2,7 @@
 
 
 #include "EnemyCharacter.h"
+#include "PlayerCharacter.h"
 #include "FlashComponent.h"
 #include "EnemyAIController.h"
 #include "Net/UnrealNetwork.h"
@@ -14,6 +15,7 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	FlashComponent = CreateDefaultSubobject<UFlashComponent>("Flash Component");
 	AttackBox = CreateDefaultSubobject<UBoxComponent>("Attack Box");
+	AttackBox->SetupAttachment(RootComponent);
 
 }
 
@@ -23,6 +25,9 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	SetReplicates(true);
 	InitializeEnemy();
+
+	AttackBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapBegin);
+	AttackBox->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapEnd);
 }
 
 void AEnemyCharacter::InitializeEnemy()
@@ -132,8 +137,19 @@ bool AEnemyCharacter::CanAttack()
 
 void AEnemyCharacter::EnableAttackBox()
 {
-	AttackBox->SetActive(true);
-	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AEnemyCharacter::DisableAttackBox, 0.5f, false);
+	//AttackBox->SetActive(true);
+	//GetWorldTimerManager().SetTimer(AttackBoxTimerHandle, this, &AEnemyCharacter::DisableAttackBox, 0.5f, false);
+	TArray<AActor*> OverlappingActors;
+	AttackBox->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* OverlappingActor : OverlappingActors)
+	{
+		if (OverlappingActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("HIT!!!!!!!!!!!!!!!!!!!!!!!!!"));
+			return;
+		}
+	}
 }
 
 
@@ -172,5 +188,13 @@ void AEnemyCharacter::SetEnemyState(EEnemyState NewState)
 EEnemyState AEnemyCharacter::GetEnemyState() const
 {
 	return CurrentState;
+}
+
+void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void AEnemyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
