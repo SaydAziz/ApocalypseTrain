@@ -4,6 +4,7 @@
 #include "BTTask_MoveToRandomLoc.h"
 #include "NavigationSystem.h"
 #include "EnemyAIController.h"
+#include "EnemyCharacter.h"
 
 
 UBTTask_MoveToRandomLoc::UBTTask_MoveToRandomLoc()
@@ -14,34 +15,36 @@ UBTTask_MoveToRandomLoc::UBTTask_MoveToRandomLoc()
 EBTNodeResult::Type UBTTask_MoveToRandomLoc::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AEnemyAIController* EnemyController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
-	APawn* ControlledPawn = EnemyController ? EnemyController->GetPawn() : nullptr;
+	APawn* EnemyPawn = EnemyController ? EnemyController->GetPawn() : nullptr;
 
-	if (!ControlledPawn)
+	if (!EnemyPawn)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	FVector Destination = GetRandomLocation(ControlledPawn);
+	FVector Destination = GetRandomLocation(EnemyPawn);
 	if (Destination.IsZero())
 	{
 		return EBTNodeResult::Failed;
 	}
 
+	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(EnemyPawn);
+	EnemyCharacter->SetEnemyState(EEnemyState::chasing);
 	EnemyController->MoveToLocation(Destination);
 
 	return EBTNodeResult::Succeeded;
 }
 
-FVector UBTTask_MoveToRandomLoc::GetRandomLocation(APawn* ControlledPawn)
+FVector UBTTask_MoveToRandomLoc::GetRandomLocation(APawn* EnemyPawn)
 {
 	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
 	
-	if (!NavSys || !ControlledPawn)
+	if (!NavSys || !EnemyPawn)
 	{
 		return FVector::ZeroVector;
 	}
 
-	FVector EnemyOrigin = ControlledPawn->GetActorLocation();
+	FVector EnemyOrigin = EnemyPawn->GetActorLocation();
 	FNavLocation RandomLocation;
 
 	bool bFoundLocation = NavSys->GetRandomReachablePointInRadius(EnemyOrigin, DestinationRadius, RandomLocation);

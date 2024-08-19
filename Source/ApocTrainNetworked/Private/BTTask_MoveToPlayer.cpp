@@ -26,10 +26,13 @@ EBTNodeResult::Type UBTTask_MoveToPlayer::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Failed;
 	}
 
+	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(EnemyPawn);
+
 	FVector EnemyOrigin = EnemyPawn->GetActorLocation();
 
 	if (APlayerCharacter* TargetPlayer = PlayerManager->GetClosestPlayer(EnemyOrigin))
 	{
+		EnemyCharacter->SetEnemyState(EEnemyState::chasing);
 		APawn* TargetPawn = TargetPlayer->GetController()->GetPawn();
 		MoveToPlayer(EnemyPawn, TargetPawn);
 			

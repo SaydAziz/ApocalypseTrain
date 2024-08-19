@@ -77,8 +77,10 @@ public:
 
 	bool CanAttack();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	//PLAYER STATE
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite)
 	EEnemyState CurrentState;
 
 	void SetEnemyState(EEnemyState NewState);

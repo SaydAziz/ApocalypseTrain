@@ -4,6 +4,7 @@
 #include "EnemyCharacter.h"
 #include "FlashComponent.h"
 #include "EnemyAIController.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -115,7 +116,7 @@ float AEnemyCharacter::GetAttackRadius()
 void AEnemyCharacter::ExecuteMeleeAttack()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
-	SetEnemyState(EEnemyState::attacking);
+	//SetEnemyState(EEnemyState::attacking);
 }
 
 bool AEnemyCharacter::CanAttack()
@@ -123,14 +124,24 @@ bool AEnemyCharacter::CanAttack()
 	return true;
 }
 
+void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEnemyCharacter, CurrentState);
+}
+
 void AEnemyCharacter::SetEnemyState(EEnemyState NewState)
 {
-    if (CurrentState != NewState)
-    {
-        FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(NewState));
-        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
-        CurrentState = NewState;
-    }
+	if (HasAuthority())
+	{
+		if (CurrentState != NewState)
+		{
+			FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(NewState));
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
+			CurrentState = NewState;
+		}
+	}
 }
 
 EEnemyState AEnemyCharacter::GetEnemyState() const
