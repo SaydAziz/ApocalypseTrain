@@ -13,6 +13,7 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	FlashComponent = CreateDefaultSubobject<UFlashComponent>("Flash Component");
+	AttackBox = CreateDefaultSubobject<UBoxComponent>("Attack Box");
 
 }
 
@@ -37,6 +38,7 @@ void AEnemyCharacter::InitializeEnemy()
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
 	currentHealth = EnemyData->Health;
 	bIsDead = true;
+	bCanAttack = true;
 	CurrentState = EEnemyState::idle;
 }
 
@@ -115,13 +117,30 @@ float AEnemyCharacter::GetAttackRadius()
 
 void AEnemyCharacter::ExecuteMeleeAttack()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
-	//SetEnemyState(EEnemyState::attacking);
+	//FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(CurrentState));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
+	bCanAttack = false;
+	SetEnemyState(EEnemyState::attacking);
+	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AEnemyCharacter::ResetAttack, EnemyData->AttackRate, false);
 }
 
 bool AEnemyCharacter::CanAttack()
 {
-	return true;
+	return bCanAttack;
+}
+
+void AEnemyCharacter::EnableAttackBox()
+{
+	AttackBox->SetActive(true);
+	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AEnemyCharacter::DisableAttackBox, 0.5f, false);
+}
+
+
+void AEnemyCharacter::DisableAttackBox()
+{
+	GetWorldTimerManager().ClearTimer(AttackBoxTimerHandle);
+	AttackBox->SetActive(false);
 }
 
 void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -129,6 +148,12 @@ void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEnemyCharacter, CurrentState);
+}
+
+void AEnemyCharacter::ResetAttack()
+{
+	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
+	bCanAttack = true;
 }
 
 void AEnemyCharacter::SetEnemyState(EEnemyState NewState)

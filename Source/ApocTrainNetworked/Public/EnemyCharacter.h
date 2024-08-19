@@ -8,6 +8,7 @@
 #include "EnemyData.h"
 #include "Damagable.h"
 #include "Poolable.h"
+#include "Components/BoxComponent.h"
 #include "EnemyCharacter.generated.h"
 
 class AEnemyAIController;
@@ -40,12 +41,17 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Enemy)
 	UEnemyData* EnemyData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
+	UBoxComponent* AttackBox;
+
 	float currentHealth;
 
 	virtual void InitializeEnemy();
 
 	//temp bool for isdead, should probobly make this a state
 	bool bIsDead;
+
+	bool bCanAttack;
 
 	AEnemyAIController* AIController;
 
@@ -60,6 +66,7 @@ public:
 
 	virtual void Damage(float damageToTake);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
 	virtual float GetHealth();
 
 	// Inherited via IPoolable
@@ -77,12 +84,21 @@ public:
 
 	bool CanAttack();
 
+	void EnableAttackBox();
+	void DisableAttackBox();
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	FTimerHandle AttackRateTimerHandle;
+	FTimerHandle AttackBoxTimerHandle;
+
+	void ResetAttack();
 
 	//PLAYER STATE
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite)
 	EEnemyState CurrentState;
 
+	UFUNCTION(BlueprintCallable, Category="Movement")
 	void SetEnemyState(EEnemyState NewState);
 
 	UFUNCTION(BlueprintCallable, Category="Movement")
