@@ -256,6 +256,7 @@ void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 	if (WeaponOnGround != NULL)
 	{
 		Server_EquipWeapon(WeaponOnGround);
+		WeaponOnGround = NULL;
 	}
 	else
 	{
