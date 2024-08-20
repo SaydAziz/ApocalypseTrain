@@ -147,6 +147,7 @@ void AEnemyCharacter::EnableAttackBox()
 		if (OverlappingActor->IsA(APlayerCharacter::StaticClass()))
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("HIT!!!!!!!!!!!!!!!!!!!!!!!!!"));
+			Cast<APlayerCharacter>(OverlappingActor)->Damage(EnemyData->Damage);
 			return;
 		}
 	}

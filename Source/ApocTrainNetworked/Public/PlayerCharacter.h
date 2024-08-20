@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Weapon.h"
 #include "Components/CapsuleComponent.h"
+#include "Damagable.h"
 #include "PlayerCharacter.generated.h"
 
 UENUM(BlueprintType)
@@ -23,7 +24,7 @@ enum class EPlayerActionState : uint8
 
 
 UCLASS()
-class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter
+class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter, public IDamagable
 {
 	GENERATED_BODY()
 
@@ -89,6 +90,9 @@ protected:
 
 	AWeapon* WeaponOnGround;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float CurrentHealth;
+
 
 	//DASH MECHANICS
 	UPROPERTY(EditAnywhere, Category = Dash)
@@ -145,6 +149,11 @@ public:
 	bool IsCarryingItem();
 	bool IsAttacking();
 	bool IsFacingWall();
+
+	virtual void Damage(float damageToTake);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
+	virtual float GetHealth();
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DropCarriedItem();
