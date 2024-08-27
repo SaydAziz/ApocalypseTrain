@@ -7,16 +7,20 @@
 #include "EnemyAIController.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	FlashComponent = CreateDefaultSubobject<UFlashComponent>("Flash Component");
+
 	AttackBox = CreateDefaultSubobject<UBoxComponent>("Attack Box");
 	AttackBox->SetupAttachment(RootComponent);
 
+	BloodSplatComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BloodSplatterVFX"));
+	BloodSplatComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +32,8 @@ void AEnemyCharacter::BeginPlay()
 
 	AttackBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapBegin);
 	AttackBox->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapEnd);
+
+	if (BloodSplatSystem) BloodSplatComp->SetAsset(BloodSplatSystem);
 }
 
 void AEnemyCharacter::InitializeEnemy()
@@ -69,6 +75,7 @@ UBehaviorTree* AEnemyCharacter::GetBehaviorTree() const
 void AEnemyCharacter::Damage(float damageToTake)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("current Health %f"), currentHealth));
+	BloodSplatComp->Activate();
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}

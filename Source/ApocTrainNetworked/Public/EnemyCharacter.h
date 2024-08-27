@@ -11,6 +11,8 @@
 #include "Components/BoxComponent.h"
 #include "EnemyCharacter.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
 class AEnemyAIController;
 
 UENUM(BlueprintType)
@@ -54,6 +56,12 @@ protected:
 	bool bCanAttack;
 
 	AEnemyAIController* AIController;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category ="Cosmetic")
+	UNiagaraComponent* BloodSplatComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
+	UNiagaraSystem* BloodSplatSystem;
 
 public:	
 	// Called every frame
