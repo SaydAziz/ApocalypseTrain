@@ -69,6 +69,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
 	virtual float GetHealth();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
+	virtual float GetMaxHealth();
+
 	// Inherited via IPoolable
 	void OnSpawn(FVector SpawnLocation) override;
 

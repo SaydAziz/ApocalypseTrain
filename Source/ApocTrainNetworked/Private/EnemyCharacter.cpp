@@ -84,6 +84,11 @@ float AEnemyCharacter::GetHealth()
 	return currentHealth;
 }
 
+float AEnemyCharacter::GetMaxHealth()
+{
+	return EnemyData->Health;
+}
+
 void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
 {
 	currentHealth = EnemyData->Health;
