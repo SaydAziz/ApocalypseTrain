@@ -23,5 +23,5 @@ protected:
 	bool SearchRandom = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Search")
-	float SearchRadius = 150.f;
+	float SearchRadius = 1500.f;
 };

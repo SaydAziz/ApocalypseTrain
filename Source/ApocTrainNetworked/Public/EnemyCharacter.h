@@ -8,9 +8,18 @@
 #include "EnemyData.h"
 #include "Damagable.h"
 #include "Poolable.h"
+#include "Components/BoxComponent.h"
 #include "EnemyCharacter.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
 class AEnemyAIController;
+
+UENUM(BlueprintType)
+enum class EEnemyState: uint8
+{
+	idle UMETA(DisplayName = "Idle"), chasing UMETA(DisplayName = "Chasing"), attacking UMETA(DisplayName = "Attacking")
+};
 
 UCLASS()
 class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IDamagable, public IPoolable
@@ -34,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Enemy)
 	UEnemyData* EnemyData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
+	UBoxComponent* AttackBox;
+
 	float currentHealth;
 
 	virtual void InitializeEnemy();
@@ -41,7 +53,15 @@ protected:
 	//temp bool for isdead, should probobly make this a state
 	bool bIsDead;
 
+	bool bCanAttack;
+
 	AEnemyAIController* AIController;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category ="Cosmetic")
+	UNiagaraComponent* BloodSplatComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
+	UNiagaraSystem* BloodSplatSystem;
 
 public:	
 	// Called every frame
@@ -54,7 +74,11 @@ public:
 
 	virtual void Damage(float damageToTake);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
 	virtual float GetHealth();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
+	virtual float GetMaxHealth();
 
 	// Inherited via IPoolable
 	void OnSpawn(FVector SpawnLocation) override;
@@ -70,4 +94,32 @@ public:
 	void ExecuteMeleeAttack();
 
 	bool CanAttack();
+
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void EnableAttackBox();
+
+	void DisableAttackBox();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	FTimerHandle AttackRateTimerHandle;
+	FTimerHandle AttackBoxTimerHandle;
+
+	void ResetAttack();
+
+	//PLAYER STATE
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite)
+	EEnemyState CurrentState;
+
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	void SetEnemyState(EEnemyState NewState);
+
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	EEnemyState GetEnemyState() const;
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

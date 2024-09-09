@@ -2,10 +2,13 @@
 
 
 #include "EnemyCharacter.h"
+#include "PlayerCharacter.h"
 #include "FlashComponent.h"
 #include "EnemyAIController.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -13,6 +16,11 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	FlashComponent = CreateDefaultSubobject<UFlashComponent>("Flash Component");
 
+	AttackBox = CreateDefaultSubobject<UBoxComponent>("Attack Box");
+	AttackBox->SetupAttachment(RootComponent);
+
+	BloodSplatComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BloodSplatterVFX"));
+	BloodSplatComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -21,6 +29,11 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	SetReplicates(true);
 	InitializeEnemy();
+
+	AttackBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapBegin);
+	AttackBox->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapEnd);
+
+	if (BloodSplatSystem) BloodSplatComp->SetAsset(BloodSplatSystem);
 }
 
 void AEnemyCharacter::InitializeEnemy()
@@ -36,6 +49,8 @@ void AEnemyCharacter::InitializeEnemy()
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
 	currentHealth = EnemyData->Health;
 	bIsDead = true;
+	bCanAttack = true;
+	CurrentState = EEnemyState::idle;
 }
 
 // Called every frame
@@ -59,7 +74,8 @@ UBehaviorTree* AEnemyCharacter::GetBehaviorTree() const
 
 void AEnemyCharacter::Damage(float damageToTake)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("currentyHealth %f"), currentHealth));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("current Health %f"), currentHealth));
+	BloodSplatComp->Activate();
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}
@@ -73,6 +89,11 @@ void AEnemyCharacter::Damage(float damageToTake)
 float AEnemyCharacter::GetHealth()
 {
 	return currentHealth;
+}
+
+float AEnemyCharacter::GetMaxHealth()
+{
+	return EnemyData->Health;
 }
 
 void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
@@ -113,12 +134,80 @@ float AEnemyCharacter::GetAttackRadius()
 
 void AEnemyCharacter::ExecuteMeleeAttack()
 {
+	//FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(CurrentState));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
+	bCanAttack = false;
+	SetEnemyState(EEnemyState::attacking);
+	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AEnemyCharacter::ResetAttack, EnemyData->AttackRate, false);
 }
 
 bool AEnemyCharacter::CanAttack()
 {
-	return true;
+	return bCanAttack;
 }
 
+void AEnemyCharacter::EnableAttackBox()
+{
+	//AttackBox->SetActive(true);
+	//GetWorldTimerManager().SetTimer(AttackBoxTimerHandle, this, &AEnemyCharacter::DisableAttackBox, 0.5f, false);
+	TArray<AActor*> OverlappingActors;
+	AttackBox->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* OverlappingActor : OverlappingActors)
+	{
+		if (OverlappingActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("HIT!!!!!!!!!!!!!!!!!!!!!!!!!"));
+			Cast<APlayerCharacter>(OverlappingActor)->Damage(EnemyData->Damage);
+			return;
+		}
+	}
+}
+
+
+void AEnemyCharacter::DisableAttackBox()
+{
+	GetWorldTimerManager().ClearTimer(AttackBoxTimerHandle);
+	AttackBox->SetActive(false);
+}
+
+void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEnemyCharacter, CurrentState);
+}
+
+void AEnemyCharacter::ResetAttack()
+{
+	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
+	bCanAttack = true;
+}
+
+void AEnemyCharacter::SetEnemyState(EEnemyState NewState)
+{
+	if (HasAuthority())
+	{
+		if (CurrentState != NewState)
+		{
+			FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(NewState));
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
+			CurrentState = NewState;
+		}
+	}
+}
+
+EEnemyState AEnemyCharacter::GetEnemyState() const
+{
+	return CurrentState;
+}
+
+void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void AEnemyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
 

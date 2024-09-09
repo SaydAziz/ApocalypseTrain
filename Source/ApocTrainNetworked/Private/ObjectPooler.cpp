@@ -23,7 +23,9 @@ void AObjectPooler::CreateObjects()
 {
 	if (ObjectType && HasAuthority()) {
 		for (int i = 0; i < TotalObjects; i++) {
-			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y, InitialPos.Z), new FRotator(), FActorSpawnParameters());
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y, InitialPos.Z), new FRotator(), SpawnParams);
 			if (IPoolable* pooledObject = Cast<IPoolable>(obj)) {
 				Pool.Enqueue(pooledObject);
 			}
