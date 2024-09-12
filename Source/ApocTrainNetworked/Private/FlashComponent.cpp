@@ -42,6 +42,10 @@ void UFlashComponent::GetMaterialsToFlash()
 
 void UFlashComponent::OnRep_MaterialColor()
 {
+	//should probobly loop all
+	if (FlashMaterials[0] == NULL) {
+		return;
+	}
 	for (UMaterialInstanceDynamic* mat : FlashMaterials) {
 		mat->SetVectorParameterValue(FName("FlashVector"), MaterialColor);
 	}
