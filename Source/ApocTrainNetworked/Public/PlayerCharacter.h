@@ -134,8 +134,6 @@ protected:
 
 	bool IsGamepadConnected();
 
-	FVector GetLookLocationAtFixedZ(float FixedZ);
-
 	FVector GetHitResultUnderCursor();
 	void RotateCharacterToLookAt(const FVector TargetPosition);
 
