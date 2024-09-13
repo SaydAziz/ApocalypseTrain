@@ -63,7 +63,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	//if a gamepad is not connected, make sure to rotate controller towards the mouse position
 	if (!IsGamepadConnected()) {
 		//get cursor in world space
-		FVector HitLocation = GetHitResultUnderCursorExample();
+		FVector HitLocation = GetHitResultUnderCursor();
 		//rotate character
 		RotateCharacterToLookAt(HitLocation);
 	}
@@ -229,7 +229,7 @@ void APlayerCharacter::DoLook(const FInputActionValue& Value)
 		Controller->SetControlRotation(NewRotation);
 	}
 	else {
-		FVector HitLocation = GetHitResultUnderCursorExample();
+		FVector HitLocation = GetHitResultUnderCursor();
 		RotateCharacterToLookAt(HitLocation);
 	}
 }
@@ -255,7 +255,7 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 	}
 }
 
-FVector APlayerCharacter::GetHitResultUnderCursorExample()
+FVector APlayerCharacter::GetHitResultUnderCursor()
 {
 	if (Controller)
 	{
