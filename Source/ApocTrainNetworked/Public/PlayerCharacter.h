@@ -132,6 +132,13 @@ protected:
 
 	void InteractReleased(const FInputActionValue& Value);
 
+	bool IsGamepadConnected();
+
+	FVector GetLookLocationAtFixedZ(float FixedZ);
+
+	FVector GetHitResultUnderCursorExample();
+	void RotateCharacterToLookAt(const FVector TargetPosition);
+
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 

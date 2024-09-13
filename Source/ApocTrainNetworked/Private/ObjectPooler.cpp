@@ -16,6 +16,7 @@ AObjectPooler::AObjectPooler()
 void AObjectPooler::BeginPlay()
 {
 	Super::BeginPlay();
+	//InitialPos = FVector(-10000, -10000, -10000);
 	CreateObjects();
 }
 
@@ -25,7 +26,7 @@ void AObjectPooler::CreateObjects()
 		for (int i = 0; i < TotalObjects; i++) {
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y, InitialPos.Z), new FRotator(), SpawnParams);
+			AActor* obj = GetWorld()->SpawnActor(ObjectType, new FVector(InitialPos.X, InitialPos.Y * (i*50), InitialPos.Z), new FRotator(), SpawnParams);
 			if (IPoolable* pooledObject = Cast<IPoolable>(obj)) {
 				Pool.Enqueue(pooledObject);
 			}

@@ -17,8 +17,10 @@ public class ApocTrainNetworked : ModuleRules
 			"Niagara",
 			"AIModule",
 			"GameplayTasks",
-			"NavigationSystem"
-		});
+			"NavigationSystem",
+            "Slate",        // using to detect if gamepad is connected
+			"SlateCore"		// using to detect if gamepad is connected
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

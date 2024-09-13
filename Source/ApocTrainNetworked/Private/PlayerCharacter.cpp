@@ -11,6 +11,8 @@
 #include "Components/SphereComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "InputCoreTypes.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -57,7 +59,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	
 	Super::Tick(DeltaTime);
-	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentState));
+	
+	//if a gamepad is not connected, make sure to rotate controller towards the mouse position
+	if (!IsGamepadConnected()) {
+		//get cursor in world space
+		FVector HitLocation = GetHitResultUnderCursor();
+		//rotate character
+		RotateCharacterToLookAt(HitLocation);
+	}
 
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
@@ -98,7 +107,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoMove);
-		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
+		//Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
 		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAttack);
@@ -209,15 +218,65 @@ void APlayerCharacter::DoMove(const FInputActionValue& Value)
 
 void APlayerCharacter::DoLook(const FInputActionValue& Value)
 {
-	const FVector2D value = Value.Get<FVector2D>();
-	if (Controller)
+	FVector2D value = Value.Get<FVector2D>();
+	
+	//if there is a gamepad connected, use gamepad rotation
+	if (IsGamepadConnected() && Controller)
 	{
 		FVector RotVector = FVector(-value.Y, value.X, 0);
 		FRotator RotDir = UKismetMathLibrary::MakeRotFromX(RotVector);
 		FRotator NewRotation = FMath::Lerp(GetControlRotation(), RotDir, 0.2f);
 		Controller->SetControlRotation(NewRotation);
 	}
+	else {
+		FVector HitLocation = GetHitResultUnderCursor();
+		RotateCharacterToLookAt(HitLocation);
+	}
 }
+
+void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
+{
+	// Get the current character location
+	FVector CharacterLocation = GetActorLocation();
+
+	TargetPosition = FVector(TargetPosition.X, TargetPosition.Y, CharacterLocation.Z);
+	// Calculate the direction to the target position 
+	FVector Direction = TargetPosition - CharacterLocation;
+
+	if (!Direction.IsNearlyZero())
+	{
+		// Get the target rotation from the direction vector
+		FRotator TargetRotation = Direction.Rotation();
+
+		// Smoothly interpolate the rotation for smoother turning
+		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f);
+
+		Controller->SetControlRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
+	}
+}
+
+FVector APlayerCharacter::GetHitResultUnderCursor()
+{
+	if (Controller)
+	{
+		FHitResult HitResult;
+		if (Cast<APlayerController>(Controller)->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
+		{
+			return HitResult.Location;
+		}
+	}
+	return FVector(0,0,0);
+}
+
+bool APlayerCharacter::IsGamepadConnected()
+{
+	if (FSlateApplication::IsInitialized())
+	{
+		return FSlateApplication::Get().IsGamepadAttached();
+	}
+	return false;
+}
+
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
 {

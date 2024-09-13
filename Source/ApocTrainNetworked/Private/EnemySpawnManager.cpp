@@ -32,7 +32,7 @@ void AEnemySpawnManager::SpawnEnemiesOnChunk(float Ypos)
 	if (HasAuthority()) {
 		for (AObjectPooler* p : EnemyPools) {
 			for (int i = 0; i < EnemiesPerChunk; i++) {
-				p->SpawnObject(FVector(i * 50, Ypos, 0));
+				p->SpawnObject(FVector(i * 50, Ypos, 40));
 			}
 		}
 	}

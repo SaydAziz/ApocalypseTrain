@@ -51,6 +51,7 @@ void AEnemyCharacter::InitializeEnemy()
 	bIsDead = true;
 	bCanAttack = true;
 	CurrentState = EEnemyState::idle;
+	OnDespawn();
 }
 
 // Called every frame
@@ -114,7 +115,6 @@ void AEnemyCharacter::OnDespawn()
 
 	GetCharacterMovement()->GravityScale = 0;
 	SetActorLocation(FVector(-10000,-10000,-10000));
-	
 }
 
 bool AEnemyCharacter::CanSpawn()
