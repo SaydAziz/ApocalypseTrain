@@ -136,7 +136,7 @@ protected:
 
 	FVector GetLookLocationAtFixedZ(float FixedZ);
 
-	FVector GetHitResultUnderCursorExample();
+	FVector GetHitResultUnderCursor();
 	void RotateCharacterToLookAt(const FVector TargetPosition);
 
 	UFUNCTION()
