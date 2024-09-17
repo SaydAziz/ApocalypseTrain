@@ -13,6 +13,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "InputCoreTypes.h"
 #include <Kismet/GameplayStatics.h>
+#include <ATPlayerController.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -30,6 +31,8 @@ APlayerCharacter::APlayerCharacter()
 	DashImpulseStrength = 2000.0f;
 	DashCooldown = 1.0f;
 	bCanDash = true;
+
+	
 }
 
 void APlayerCharacter::SetupStimulusSource()
@@ -60,12 +63,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	Super::Tick(DeltaTime);
 	
-	//if a gamepad is not connected, make sure to rotate controller towards the mouse position
-	if (!IsGamepadConnected()) {
+	if (!bIsDead && bIsUsingMouse) {
 		//get cursor in world space
 		FVector HitLocation = GetHitResultUnderCursor();
 		//rotate character
 		RotateCharacterToLookAt(HitLocation);
+		if (Controller) {
+
+			UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
+		}
+	}
+
+	if (Controller) {
+		//UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
 	}
 
 	float CurrentSpeed = GetVelocity().Size();
@@ -82,14 +92,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 		SetPlayerMovementState(EPlayerMovementState::standing);
 	}
 
+	if (!Controller) {
+		return;
+	}
+	
+
 }
 
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(APlayerCharacter, EquippedWeapon);
-}
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -107,8 +116,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoMove);
-		//Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
-
+		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
 		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAttack);
 		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAttack);
@@ -116,6 +124,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
 
+}
+
+void APlayerCharacter::OnPlayerRegistered()
+{
+	//should also check if some global bool for the client that is Player 1 uses mouse is checked or something
+	int localIndex = Cast<AATPlayerController>(Controller)->LocalPlayerIndex;
+	if (localIndex == 0) {
+		bIsUsingMouse = true;
+	}
 }
 
 bool APlayerCharacter::IsCarryingItem()
@@ -150,19 +167,7 @@ bool APlayerCharacter::IsFacingWall()
 	return false;
 }
 
-void APlayerCharacter::Damage(float damageToTake)
-{
-	CurrentHealth -= damageToTake;
-	if (CurrentHealth <= 0) {
-		CurrentHealth = 0;
-		//Implement Death mechanics here
-	}
-}
 
-float APlayerCharacter::GetHealth()
-{
-	return CurrentHealth;
-}
 
 void APlayerCharacter::Server_DropCarriedItem_Implementation()
 {
@@ -205,6 +210,9 @@ void APlayerCharacter::Server_SpawnDefaultWeapon_Implementation()
 
 void APlayerCharacter::DoMove(const FInputActionValue& Value)
 {
+	if (bIsDead) {
+		return;
+	}
 	const FVector2D value = Value.Get<FVector2D>();
 
 	if (Controller && ((value.X != 0) || (value.Y != 0)))
@@ -218,19 +226,16 @@ void APlayerCharacter::DoMove(const FInputActionValue& Value)
 
 void APlayerCharacter::DoLook(const FInputActionValue& Value)
 {
-	FVector2D value = Value.Get<FVector2D>();
-	
-	//if there is a gamepad connected, use gamepad rotation
-	if (IsGamepadConnected() && Controller)
+	if (bIsUsingMouse) {
+		return;
+	}
+	const FVector2D value = Value.Get<FVector2D>();
+	if (Controller)
 	{
 		FVector RotVector = FVector(-value.Y, value.X, 0);
 		FRotator RotDir = UKismetMathLibrary::MakeRotFromX(RotVector);
 		FRotator NewRotation = FMath::Lerp(GetControlRotation(), RotDir, 0.2f);
 		Controller->SetControlRotation(NewRotation);
-	}
-	else {
-		FVector HitLocation = GetHitResultUnderCursor();
-		RotateCharacterToLookAt(HitLocation);
 	}
 }
 
@@ -250,14 +255,53 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 
 		// Smoothly interpolate the rotation for smoother turning
 		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f);
-
-		Controller->SetControlRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
+		if (Controller) {
+			Controller->SetControlRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
+		}
 	}
+}
+
+void APlayerCharacter::DespawnPlayer()
+{
+	if (HasAuthority()) {
+		GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
+	}
+}
+
+void APlayerCharacter::RespawnPlayer()
+{
+	if (HasAuthority()) {
+		currentRespawnTime -= 1;
+		if (currentRespawnTime > 0) {
+			GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
+			return;
+		}
+		bIsDead = false;
+	}
+}
+
+void APlayerCharacter::Damage(float damageToTake)
+{
+	if (bIsDead) {
+		return;
+	}
+	CurrentHealth -= damageToTake;
+	if (CurrentHealth <= 0) {
+		//bIsDead = true;
+		CurrentHealth = 0;
+		currentRespawnTime = respawnTime;
+		//DespawnPlayer();
+	}
+}
+
+float APlayerCharacter::GetHealth()
+{
+	return CurrentHealth;
 }
 
 FVector APlayerCharacter::GetHitResultUnderCursor()
 {
-	if (Controller)
+	if (Controller && IsLocallyControlled())
 	{
 		FHitResult HitResult;
 		if (Cast<APlayerController>(Controller)->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
@@ -267,16 +311,6 @@ FVector APlayerCharacter::GetHitResultUnderCursor()
 	}
 	return FVector(0,0,0);
 }
-
-bool APlayerCharacter::IsGamepadConnected()
-{
-	if (FSlateApplication::IsInitialized())
-	{
-		return FSlateApplication::Get().IsGamepadAttached();
-	}
-	return false;
-}
-
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)
 {
@@ -304,6 +338,9 @@ void APlayerCharacter::Server_DoDash_Implementation(FVector Impulse)
 
 void APlayerCharacter::StartAttack(const FInputActionValue& Value)
 {
+	if (bIsDead) {
+		return;
+	}
 	if (!IsCarryingItem()) {
 		SetPlayerActionState(EPlayerActionState::attacking);
 		EquippedWeapon->StartAttack();
@@ -389,6 +426,17 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 	}
 }
 
+int APlayerCharacter::GetPlayerIndex()
+{
+	//return Cast<AATPlayerController>(Controller)->PlayerIndex;
+	return PlayerIndex;
+}
+
+//void APlayerCharacter::SetPlayerIndex(int index)
+//{
+//	Cast<AATPlayerController>(Controller)->PlayerIndex = index;
+//}
+
 void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementState)
 {
 	if (CurrentMovementState != NewMovementState)
@@ -424,4 +472,14 @@ void APlayerCharacter::SetPlayerActionState(EPlayerActionState NewActionState)
 		}
 		CurrentActionState = NewActionState;
 	}
+}
+
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, EquippedWeapon);
+	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
+	DOREPLIFETIME(APlayerCharacter, bIsUsingMouse);
 }

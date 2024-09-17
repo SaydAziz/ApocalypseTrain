@@ -40,6 +40,7 @@ int APlayerManager::RegisterPlayerWithManager(APlayerCharacter* joinedPlayer)
 {
 	int index = ActivePlayers.Add(joinedPlayer);
 	joinedPlayer->PlayerIndex = index;
+	joinedPlayer->OnPlayerRegistered();
 	return index;
 }
 
