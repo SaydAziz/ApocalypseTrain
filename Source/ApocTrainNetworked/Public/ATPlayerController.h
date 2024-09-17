@@ -21,6 +21,7 @@ protected:
 public:
 	int PlayerIndex;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int LocalPlayerIndex;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)

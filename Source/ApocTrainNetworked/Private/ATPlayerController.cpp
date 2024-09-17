@@ -5,6 +5,7 @@
 
 void AATPlayerController::BeginPlay()
 {
+    Super::BeginPlay();
     if (IsLocalController()) {
         LocalPlayerIndex = GetLocalPlayerIndex();
         UE_LOG(LogTemp, Log, TEXT("CONTROLLER Player Index: %d"), LocalPlayerIndex);
