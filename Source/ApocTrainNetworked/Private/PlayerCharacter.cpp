@@ -117,8 +117,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoMove);
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoLook);
 		Input->BindAction(DashAction, ETriggerEvent::Started, this, &APlayerCharacter::DoDash);
-		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAttack);
-		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAttack);
+		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::StartAction);
+		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAction);
 		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
 	}
@@ -176,10 +176,10 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 			float upwardForce = 0.5f;
 			if (IsFacingWall()) {
 				carriedObject->SetActorLocation(GetActorLocation());
-				carriedObject->Server_DropObject((this->GetActorForwardVector() * -1) * 0.2f * throwVelocity, GetActorLocation());
+				carriedObject->Server_DropObject((this->GetActorForwardVector() * -1) * 0.2f * throwVelocity, carriedObject->GetActorLocation());
 			}
 			else {
-				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, GetActorLocation());
+				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, carriedObject->GetActorLocation());
 			}
 		}
 		SetPlayerActionState(EPlayerActionState::idle);
@@ -346,7 +346,7 @@ void APlayerCharacter::Server_DoDash_Implementation(FVector Impulse)
 	GetCharacterMovement()->Launch(Impulse);
 }
 
-void APlayerCharacter::StartAttack(const FInputActionValue& Value)
+void APlayerCharacter::StartAction(const FInputActionValue& Value)
 {
 	if (bIsDead) {
 		return;
@@ -355,9 +355,12 @@ void APlayerCharacter::StartAttack(const FInputActionValue& Value)
 		SetPlayerActionState(EPlayerActionState::attacking);
 		EquippedWeapon->StartAttack();
 	}
+	else {
+		Server_DropCarriedItem();
+	}
 }
 
-void APlayerCharacter::StopAttack(const FInputActionValue& Value)
+void APlayerCharacter::StopAction(const FInputActionValue& Value)
 {
 	StopAttacking();
 }

@@ -133,9 +133,9 @@ protected:
 
 	void DoDash(const FInputActionValue& Value);
 
-	void StartAttack(const FInputActionValue& Value);
+	void StartAction(const FInputActionValue& Value);
 
-	void StopAttack(const FInputActionValue& Value);
+	void StopAction(const FInputActionValue& Value);
 
 	void StopAttacking();
 
