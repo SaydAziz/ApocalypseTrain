@@ -50,7 +50,7 @@ void AEnemyCharacter::InitializeEnemy()
 	currentHealth = EnemyData->Health;
 	bCanAttack = true;
 	CurrentState = EEnemyState::idle;
-	if (!bIsObjectPooled) {
+	if (!bIsNotPooled) {
 		OnDespawn();
 	}
 }
