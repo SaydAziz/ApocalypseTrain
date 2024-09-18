@@ -71,7 +71,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Spawning)
-	bool bIsObjectPooled;
+	bool bIsNotPooled;
 
 	UBehaviorTree* GetBehaviorTree() const;
 
