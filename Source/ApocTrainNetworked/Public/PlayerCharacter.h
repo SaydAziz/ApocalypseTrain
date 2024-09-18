@@ -68,6 +68,8 @@ public:
 
 protected:
 
+	class APlayerManager* playerManager;
+
 	//PLAYER STATE
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EPlayerMovementState CurrentMovementState;
@@ -135,11 +137,11 @@ protected:
 
 	void StopAttack(const FInputActionValue& Value);
 
+	void StopAttacking();
+
 	void InteractPressed(const FInputActionValue& Value);
 
 	void InteractReleased(const FInputActionValue& Value);
-
-	bool IsGamepadConnected();
 
 	FVector GetHitResultUnderCursor();
 
@@ -150,11 +152,26 @@ protected:
 
 	void DespawnPlayer();
 	void RespawnPlayer();
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Respawn)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Respawn)
 	int respawnTime;
 	int currentRespawnTime;
 	FTimerHandle respawnTimerHandle;
 
+	//DAMAGE
+	FTimerHandle damageSlowTimerHandle;
+	void ResetMovementSpeed();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage", meta = (ToolTip = "How long the player is slowed down for after taking damage"))
+	float DamageSlowTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = health)
+	float MaxHealth;
+
+	//MOVEMENT
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float MaxMoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float InjuredMoveSpeed;
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
@@ -170,7 +187,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void OnPlayerRegistered();
+	void OnPlayerRegistered(class APlayerManager* manager);
 
 	bool IsCarryingItem();
 	bool IsAttacking();

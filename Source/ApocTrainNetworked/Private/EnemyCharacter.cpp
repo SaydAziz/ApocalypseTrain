@@ -48,10 +48,11 @@ void AEnemyCharacter::InitializeEnemy()
 	AIController->SetSightSenseValues(EnemyData->SightRadius);
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
 	currentHealth = EnemyData->Health;
-	bIsDead = true;
 	bCanAttack = true;
 	CurrentState = EEnemyState::idle;
-	OnDespawn();
+	if (!bIsObjectPooled) {
+		OnDespawn();
+	}
 }
 
 // Called every frame

@@ -36,11 +36,16 @@ void APlayerManager::Tick(float DeltaTime)
 	
 }
 
+FVector APlayerManager::GetPlayerDeathPos()
+{
+	return playerDeathPosition;
+}
+
 int APlayerManager::RegisterPlayerWithManager(APlayerCharacter* joinedPlayer)
 {
 	int index = ActivePlayers.Add(joinedPlayer);
 	joinedPlayer->PlayerIndex = index;
-	joinedPlayer->OnPlayerRegistered();
+	joinedPlayer->OnPlayerRegistered(this);
 	return index;
 }
 
@@ -93,6 +98,14 @@ FVector APlayerManager::GetPlayerSpawnPoint()
 		pos.Y += train->GetActorLocation().Y;
 	}
 	return pos;
+}
+
+bool APlayerManager::IsOutOfBounds(FVector location)
+{
+	if (location.Z < -100) {
+		return true;
+	}
+	return false;
 }
 
 

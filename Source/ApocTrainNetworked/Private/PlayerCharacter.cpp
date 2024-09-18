@@ -14,6 +14,7 @@
 #include "InputCoreTypes.h"
 #include <Kismet/GameplayStatics.h>
 #include <ATPlayerController.h>
+#include "PlayerManager.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -52,8 +53,8 @@ void APlayerCharacter::BeginPlay()
 
 	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
 	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
-
-	CurrentHealth = 100.0f;
+	MaxMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	CurrentHealth = MaxHealth;
 	Server_SpawnDefaultWeapon();
 }
 
@@ -68,15 +69,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 		FVector HitLocation = GetHitResultUnderCursor();
 		//rotate character
 		RotateCharacterToLookAt(HitLocation);
-		if (Controller) {
+	/*	if (Controller) {
 
 			UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
-		}
+		}*/
 	}
-
-	if (Controller) {
-		//UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
-	}
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Dead: %d"), bIsDead));
 
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
@@ -92,10 +90,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		SetPlayerMovementState(EPlayerMovementState::standing);
 	}
 
-	if (!Controller) {
-		return;
+	//small hack to keep us from falling infinitly off the map for now. 
+	//Bounds checking should probobly be a more universal thing, as we should use it to despawn other items
+	if (playerManager && playerManager->IsOutOfBounds(GetActorLocation())) {
+		Damage(99999999999);
 	}
-	
 
 }
 
@@ -126,8 +125,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-void APlayerCharacter::OnPlayerRegistered()
+void APlayerCharacter::OnPlayerRegistered(APlayerManager* manager)
 {
+	playerManager = manager;
 	//should also check if some global bool for the client that is Player 1 uses mouse is checked or something
 	int localIndex = Cast<AATPlayerController>(Controller)->LocalPlayerIndex;
 	if (localIndex == 0) {
@@ -263,6 +263,11 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 
 void APlayerCharacter::DespawnPlayer()
 {
+	CurrentHealth = 0;
+	currentRespawnTime = respawnTime;
+	bIsDead = true;
+	StopAttacking();
+	SetActorLocation(playerManager->GetPlayerDeathPos());
 	if (HasAuthority()) {
 		GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 	}
@@ -276,7 +281,11 @@ void APlayerCharacter::RespawnPlayer()
 			GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 			return;
 		}
-		bIsDead = false;
+		else {
+			CurrentHealth = MaxHealth;
+			bIsDead = false;
+			SetActorLocation(playerManager->GetPlayerSpawnPoint());
+		}
 	}
 }
 
@@ -285,12 +294,13 @@ void APlayerCharacter::Damage(float damageToTake)
 	if (bIsDead) {
 		return;
 	}
-	CurrentHealth -= damageToTake;
-	if (CurrentHealth <= 0) {
-		//bIsDead = true;
-		CurrentHealth = 0;
-		currentRespawnTime = respawnTime;
-		//DespawnPlayer();
+	if (HasAuthority()) {
+		GetCharacterMovement()->MaxWalkSpeed = InjuredMoveSpeed;
+		GetWorld()->GetTimerManager().SetTimer(damageSlowTimerHandle, this, &APlayerCharacter::ResetMovementSpeed, DamageSlowTime, false);
+		CurrentHealth -= damageToTake;
+		if (CurrentHealth <= 0) {
+			DespawnPlayer();
+		}
 	}
 }
 
@@ -349,6 +359,11 @@ void APlayerCharacter::StartAttack(const FInputActionValue& Value)
 
 void APlayerCharacter::StopAttack(const FInputActionValue& Value)
 {
+	StopAttacking();
+}
+
+void APlayerCharacter::StopAttacking()
+{
 	if (IsAttacking()) {
 		EquippedWeapon->StopAttack();
 		if (!IsCarryingItem()) {
@@ -380,6 +395,11 @@ void APlayerCharacter::InteractPressed(const FInputActionValue& Value)
 void APlayerCharacter::InteractReleased(const FInputActionValue& Value)
 {
 	Server_OnInteract(false);
+}
+
+void APlayerCharacter::ResetMovementSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
 }
 
 void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
