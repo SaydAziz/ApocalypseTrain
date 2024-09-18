@@ -25,9 +25,14 @@ protected:
 
 	class ATrain* train;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = Spawning)
+	FVector playerDeathPosition;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	FVector GetPlayerDeathPos();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<APlayerCharacter*> ActivePlayers;
@@ -50,5 +55,5 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetPlayerSpawnPoint();
 
-
+	bool IsOutOfBounds(FVector location);
 };

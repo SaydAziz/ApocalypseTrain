@@ -60,10 +60,15 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool Interacted;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	int PlayerIndex;
 
+	int GetPlayerIndex();
+	//void SetPlayerIndex(int index);
+
 protected:
+
+	class APlayerManager* playerManager;
 
 	//PLAYER STATE
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -118,6 +123,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//CONTROLS
+	UPROPERTY(Replicated)
+	bool bIsUsingMouse;
+
 	void DoMove(const FInputActionValue& Value);
 
 	void DoLook(const FInputActionValue& Value);
@@ -128,14 +137,41 @@ protected:
 
 	void StopAttack(const FInputActionValue& Value);
 
+	void StopAttacking();
+
 	void InteractPressed(const FInputActionValue& Value);
 
 	void InteractReleased(const FInputActionValue& Value);
 
-	bool IsGamepadConnected();
-
 	FVector GetHitResultUnderCursor();
+
 	void RotateCharacterToLookAt(const FVector TargetPosition);
+
+	//SPAWNING
+	bool bIsDead;
+
+	void DespawnPlayer();
+	void RespawnPlayer();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Respawn)
+	int respawnTime;
+	int currentRespawnTime;
+	FTimerHandle respawnTimerHandle;
+
+	//DAMAGE
+	FTimerHandle damageSlowTimerHandle;
+	void ResetMovementSpeed();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage", meta = (ToolTip = "How long the player is slowed down for after taking damage"))
+	float DamageSlowTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = health)
+	float MaxHealth;
+
+	//MOVEMENT
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float MaxMoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float InjuredMoveSpeed;
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
@@ -150,6 +186,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void OnPlayerRegistered(class APlayerManager* manager);
 
 	bool IsCarryingItem();
 	bool IsAttacking();
