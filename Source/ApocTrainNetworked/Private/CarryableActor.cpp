@@ -53,7 +53,8 @@ void ACarryableActor::Server_DropObject_Implementation(FVector directionToLaunch
 {
 	carriedState = ECarriedState::Dropped;
 	PhysicsComponent->SetSimulatePhysics(true);
-	PhysicsComponent->SetPhysicsLinearVelocity(LastCarryingPlayer->GetVelocity());
+	//PhysicsComponent->SetPhysicsLinearVelocity(LastCarryingPlayer->GetVelocity());
+	PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 	PhysicsComponent->AddImpulse(directionToLaunch);
 	wasDropped = true;
 }
