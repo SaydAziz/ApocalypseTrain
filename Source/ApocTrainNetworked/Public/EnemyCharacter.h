@@ -46,6 +46,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
 	UBoxComponent* AttackBox;
 
+	UPROPERTY(Replicated)
 	float currentHealth;
 
 	virtual void InitializeEnemy();
@@ -92,6 +93,8 @@ public:
 
 	void IncreaseEnemyDifficulty();
 
+	//ATTACK
+
 	float GetAttackRadius();
 
 	void ExecuteMeleeAttack();
@@ -103,7 +106,6 @@ public:
 
 	void DisableAttackBox();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	FTimerHandle AttackRateTimerHandle;
 	FTimerHandle AttackBoxTimerHandle;
@@ -120,9 +122,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	EEnemyState GetEnemyState() const;
 
+	//ON DAMAGE
+	UFUNCTION(Server, Unreliable)
+	void Server_OnDamaged(float damageTaken);
+	void Server_OnDamaged_Implementation(float damageTaken);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_OnDamaged(float damageTaken);
+	void Multi_OnDamaged_Implementation(float damageTaken);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDamaged(float health);
+
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

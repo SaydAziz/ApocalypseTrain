@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/WidgetComponent.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -74,14 +75,31 @@ UBehaviorTree* AEnemyCharacter::GetBehaviorTree() const
 	return Tree;
 }
 
+void AEnemyCharacter::Server_OnDamaged_Implementation(float damageTaken) {
+	if (HasAuthority()) {
+		OnDamaged(damageTaken);
+		BloodSplatComp->Activate();
+	}
+	Multi_OnDamaged(damageTaken);
+}
+
+void AEnemyCharacter::Multi_OnDamaged_Implementation(float damageTaken) {
+	if (!HasAuthority()) {
+		OnDamaged(damageTaken);
+		BloodSplatComp->Activate();
+	}
+}
+
 void AEnemyCharacter::Damage(float damageToTake)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::Printf(TEXT("current Health %f"), currentHealth));
-	BloodSplatComp->Activate();
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}
 	currentHealth -= damageToTake;
+	//replicate value to server to update cosmetic effects
+	if (HasAuthority()) {
+		Server_OnDamaged(currentHealth);
+	}
 	if (currentHealth <= 0) {
 		currentHealth = 0;
 		OnDespawn();
@@ -178,6 +196,7 @@ void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEnemyCharacter, CurrentState);
+	DOREPLIFETIME(AEnemyCharacter, currentHealth);
 }
 
 void AEnemyCharacter::ResetAttack()
@@ -211,4 +230,5 @@ void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 void AEnemyCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 }
+
 
