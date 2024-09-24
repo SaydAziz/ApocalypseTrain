@@ -4,6 +4,7 @@
 #include "ProjectileWeapon.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Damagable.h"
+#include <DamageComponent.h>
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -65,9 +66,12 @@ void AProjectileWeapon::Attack()
 		{
 			if (HitResult.GetActor()) {
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
-				if (IDamagable* damagableActor = Cast<IDamagable>(HitResult.GetActor())) {
-					damagableActor->Damage(Data->Damage);
+				if (UDamageComponent* dmgComp = HitResult.GetActor()->GetComponentByClass<UDamageComponent>()) {
+					dmgComp->Damage(Data->Damage);
 				}
+				/*if (IDamagable* damagableActor = Cast<IDamagable>(HitResult.GetActor())) {
+					damagableActor->Damage(Data->Damage);
+				}*/
 			}
 		}
 

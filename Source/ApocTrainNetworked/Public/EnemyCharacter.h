@@ -22,7 +22,7 @@ enum class EEnemyState: uint8
 };
 
 UCLASS()
-class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IDamagable, public IPoolable
+class APOCTRAINNETWORKED_API AEnemyCharacter : public ACharacter, public IPoolable
 {
 	GENERATED_BODY()
 
@@ -31,6 +31,8 @@ public:
 	AEnemyCharacter();
 
 protected:
+
+	bool bIsDead;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -46,13 +48,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
 	UBoxComponent* AttackBox;
 
-	UPROPERTY(Replicated)
-	float currentHealth;
-
 	virtual void InitializeEnemy();
-
-	//temp bool for isdead, should probobly make this a state
-	bool bIsDead;
 
 	bool bCanAttack;
 
@@ -63,6 +59,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
 	UNiagaraSystem* BloodSplatSystem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UDamageComponent* DamageComponent;
 
 public:	
 	// Called every frame
@@ -76,17 +75,13 @@ public:
 
 	UBehaviorTree* GetBehaviorTree() const;
 
-	virtual void Damage(float damageToTake);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
-	virtual float GetHealth_Implementation();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
-	virtual float GetMaxHealth_Implementation();
+	UFUNCTION()
+	virtual void TakeDamage(float damageToTake);
 
 	// Inherited via IPoolable
 	void OnSpawn(FVector SpawnLocation) override;
 
+	UFUNCTION()
 	void OnDespawn() override;
 
 	bool CanSpawn() override;

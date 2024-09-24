@@ -10,7 +10,7 @@
 #include "Obstacle.generated.h"
 
 UCLASS()
-class APOCTRAINNETWORKED_API AObstacle : public AActor, public IDamagable
+class APOCTRAINNETWORKED_API AObstacle : public AActor
 {
 	GENERATED_BODY()
 	
@@ -27,8 +27,6 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	float currentHealth;
-
 	UPROPERTY(EditDefaultsOnly)
 	class UPulseComponent* pulseComponent;
 
@@ -38,17 +36,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* DestroyedDust;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UDamageComponent* DamageComponent;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Damage(float damageToTake);
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	virtual float GetHealth_Implementation();
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	virtual float GetMaxHealth_Implementation();
+	UFUNCTION()
+	virtual void TakeDamage(float damageToTake);
+	UFUNCTION()
+	virtual void OnObjectDeath();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamageTaken();
 
 };
