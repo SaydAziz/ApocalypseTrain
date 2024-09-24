@@ -198,6 +198,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
 	virtual float GetHealth();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
+	virtual float GetMaxHealth();
+
 	UFUNCTION(Server, Unreliable)
 	void Server_DropCarriedItem();
 

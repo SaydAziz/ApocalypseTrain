@@ -309,6 +309,11 @@ float APlayerCharacter::GetHealth()
 	return CurrentHealth;
 }
 
+float APlayerCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
 FVector APlayerCharacter::GetHitResultUnderCursor()
 {
 	if (Controller && IsLocallyControlled())

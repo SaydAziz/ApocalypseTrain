@@ -27,4 +27,6 @@ public:
 
 	virtual float GetHealth() = 0;
 
+	virtual float GetMaxHealth() = 0;
+
 };

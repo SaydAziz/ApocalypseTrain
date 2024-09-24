@@ -66,3 +66,8 @@ float AObstacle::GetHealth()
 	return currentHealth;
 }
 
+float AObstacle::GetMaxHealth()
+{
+	return MaxHealth;
+}
+

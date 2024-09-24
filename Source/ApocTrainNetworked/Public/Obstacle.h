@@ -43,7 +43,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Damage(float damageToTake);
-
+	UFUNCTION(BlueprintCallable, Category = "Damage")
 	virtual float GetHealth();
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	virtual float GetMaxHealth();
 
 };
