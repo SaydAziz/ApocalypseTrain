@@ -304,12 +304,12 @@ void APlayerCharacter::Damage(float damageToTake)
 	}
 }
 
-float APlayerCharacter::GetHealth()
+float APlayerCharacter::GetHealth_Implementation()
 {
 	return CurrentHealth;
 }
 
-float APlayerCharacter::GetMaxHealth()
+float APlayerCharacter::GetMaxHealth_Implementation()
 {
 	return MaxHealth;
 }

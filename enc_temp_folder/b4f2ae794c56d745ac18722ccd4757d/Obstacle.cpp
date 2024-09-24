@@ -50,7 +50,6 @@ void AObstacle::Tick(float DeltaTime)
 void AObstacle::Damage(float damageToTake)
 {
 	currentHealth -= damageToTake;
-	OnDamageTaken();
 	if (pulseComponent) {
 		pulseComponent->Pulse();
 	}

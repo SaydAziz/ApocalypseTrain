@@ -79,10 +79,10 @@ public:
 	virtual void Damage(float damageToTake);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
-	virtual float GetHealth();
+	virtual float GetHealth_Implementation();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
-	virtual float GetMaxHealth();
+	virtual float GetMaxHealth_Implementation();
 
 	// Inherited via IPoolable
 	void OnSpawn(FVector SpawnLocation) override;

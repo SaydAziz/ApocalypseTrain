@@ -96,6 +96,7 @@ void AEnemyCharacter::Damage(float damageToTake)
 		FlashComponent->Flash();
 	}
 	currentHealth -= damageToTake;
+	//OnDamageTaken.Broadcast();
 	//replicate value to server to update cosmetic effects
 	if (HasAuthority()) {
 		Server_OnDamaged(currentHealth);

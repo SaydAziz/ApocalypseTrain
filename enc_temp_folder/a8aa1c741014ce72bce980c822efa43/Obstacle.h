@@ -48,7 +48,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	virtual float GetMaxHealth_Implementation();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamageTaken();
-
 };
