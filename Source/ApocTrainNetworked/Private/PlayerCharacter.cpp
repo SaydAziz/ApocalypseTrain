@@ -130,6 +130,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(AttackAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAction);
 		Input->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::InteractPressed);
 		Input->BindAction(InteractAction, ETriggerEvent::Completed, this, &APlayerCharacter::InteractReleased);
+
+		Input->BindAction(PauseMenuAction, ETriggerEvent::Started, this, &APlayerCharacter::TogglePauseMenu);
 	}
 
 }
