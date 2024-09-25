@@ -6,7 +6,6 @@
 #include "FlashComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "Particles/ParticleSystemComponent.h"
-#include "DamageComponent.h"
 
 // Sets default values
 AObstacle::AObstacle()
@@ -16,11 +15,6 @@ AObstacle::AObstacle()
 	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
 	flashComponent = CreateDefaultSubobject<UFlashComponent>(TEXT("FlashComponent"));
 
-	DamageComponent = CreateDefaultSubobject<UDamageComponent>("Damage Component");
-	DamageComponent->SetIsReplicated(true);
-	DamageComponent->OnDamageTaken.AddDynamic(this, &AObstacle::TakeDamage);
-	DamageComponent->OnDeath.AddDynamic(this, &AObstacle::OnObjectDeath);
-
 }
 
 // Called when the game starts or when spawned
@@ -29,8 +23,7 @@ void AObstacle::BeginPlay()
 	Super::BeginPlay();
 	SetReplicates(true);
 	bAlwaysRelevant = true;
-	DamageComponent->MaxHealth = MaxHealth;
-	DamageComponent->Reset();
+	currentHealth = MaxHealth;
 }
 
 void AObstacle::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -54,19 +47,27 @@ void AObstacle::Tick(float DeltaTime)
 
 }
 
-void AObstacle::TakeDamage(float damageToTake)
+void AObstacle::Damage(float damageToTake)
 {
+	currentHealth -= damageToTake;
 	if (pulseComponent) {
 		pulseComponent->Pulse();
 	}
 	if (flashComponent) {
 		flashComponent->Flash();
 	}
+	if (currentHealth <= 0) {
+		Destroy();
+	}
 }
 
-void AObstacle::OnObjectDeath()
+float AObstacle::GetHealth_Implementation()
 {
-	Destroy();
+	return currentHealth;
 }
 
+float AObstacle::GetMaxHealth_Implementation()
+{
+	return MaxHealth;
+}
 

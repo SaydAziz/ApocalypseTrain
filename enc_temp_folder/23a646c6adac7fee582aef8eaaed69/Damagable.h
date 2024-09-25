@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Damagable.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageTaken);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -23,6 +24,10 @@ class APOCTRAINNETWORKED_API IDamagable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	/*UPROPERTY(BlueprintAssignable, Category = "Damage")
+	FOnDamageTaken OnDamageTaken;*/
+	FOnDamageTaken OnDamageTaken;
 
 	virtual void Damage(float damageToTake) = 0;
 

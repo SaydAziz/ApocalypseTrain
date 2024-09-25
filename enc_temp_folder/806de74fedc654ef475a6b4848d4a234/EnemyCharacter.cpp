@@ -10,18 +10,11 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/WidgetComponent.h"
-#include "DamageComponent.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	DamageComponent = CreateDefaultSubobject<UDamageComponent>("Damage Component");
-	DamageComponent->SetIsReplicated(true);
-	DamageComponent->OnDamageTaken.AddDynamic(this, &AEnemyCharacter::TakeDamage);
-	DamageComponent->OnDeath.AddDynamic(this, &AEnemyCharacter::OnDespawn);
-
 	FlashComponent = CreateDefaultSubobject<UFlashComponent>("Flash Component");
 
 	AttackBox = CreateDefaultSubobject<UBoxComponent>("Attack Box");
@@ -55,8 +48,7 @@ void AEnemyCharacter::InitializeEnemy()
 	}
 	AIController->SetSightSenseValues(EnemyData->SightRadius);
 	GetCharacterMovement()->MaxWalkSpeed = EnemyData->Speed;
-	DamageComponent->MaxHealth = EnemyData->Health;
-	DamageComponent->Reset();
+	currentHealth = EnemyData->Health;
 	bCanAttack = true;
 	CurrentState = EEnemyState::idle;
 	if (!bIsNotPooled) {
@@ -98,23 +90,36 @@ void AEnemyCharacter::Multi_OnDamaged_Implementation(float damageTaken) {
 	}
 }
 
-void AEnemyCharacter::TakeDamage(float damageToTake)
+void AEnemyCharacter::Damage(float damageToTake)
 {
-	if (bIsDead) {
-		return;
-	}
 	if (FlashComponent) {
 		FlashComponent->Flash();
 	}
+	currentHealth -= damageToTake;
+	//OnDamageTaken.Broadcast();
+	//replicate value to server to update cosmetic effects
 	if (HasAuthority()) {
-		Server_OnDamaged(DamageComponent->GetHealth());
+		Server_OnDamaged(currentHealth);
 	}
+	if (currentHealth <= 0) {
+		currentHealth = 0;
+		OnDespawn();
+	}
+}
+
+float AEnemyCharacter::GetHealth_Implementation()
+{
+	return currentHealth;
+}
+
+float AEnemyCharacter::GetMaxHealth_Implementation()
+{
+	return EnemyData->Health;
 }
 
 void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
 {
-	DamageComponent->MaxHealth = EnemyData->Health;
-	DamageComponent->Reset();
+	currentHealth = EnemyData->Health;
 	bIsDead = false;
 	GetCharacterMovement()->GravityScale = 1;
 	SetActorLocation(SpawnLocation);
@@ -127,6 +132,7 @@ void AEnemyCharacter::OnDespawn()
 	bIsDead = true;
 	if (AIController)
 		AIController->SetIsDead(bIsDead);
+
 	GetCharacterMovement()->GravityScale = 0;
 	SetActorLocation(FVector(-10000,-10000,-10000));
 }
@@ -172,8 +178,8 @@ void AEnemyCharacter::EnableAttackBox()
 	{
 		if (OverlappingActor->IsA(APlayerCharacter::StaticClass()))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("HIT!!!!!!!!!!!!!!!!!!!!!!!!!"));
-			Cast<APlayerCharacter>(OverlappingActor)->GetComponentByClass<UDamageComponent>()->Damage(EnemyData->Damage);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("HIT!!!!!!!!!!!!!!!!!!!!!!!!!"));
+			Cast<APlayerCharacter>(OverlappingActor)->Damage(EnemyData->Damage);
 			return;
 		}
 	}
@@ -189,7 +195,9 @@ void AEnemyCharacter::DisableAttackBox()
 void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 	DOREPLIFETIME(AEnemyCharacter, CurrentState);
+	DOREPLIFETIME(AEnemyCharacter, currentHealth);
 }
 
 void AEnemyCharacter::ResetAttack()

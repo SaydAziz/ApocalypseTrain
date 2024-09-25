@@ -15,7 +15,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <ATPlayerController.h>
 #include "PlayerManager.h"
-
+#include "DamageComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -26,6 +26,10 @@ APlayerCharacter::APlayerCharacter()
 	characterMesh = FindComponentByClass<USkeletalMeshComponent>();
 	CollisionCapsule = FindComponentByClass<UCapsuleComponent>();
 
+	DamageComponent = CreateDefaultSubobject<UDamageComponent>("Player Damage Component");
+	DamageComponent->SetIsReplicated(true);
+	DamageComponent->OnDamageTaken.AddDynamic(this, &APlayerCharacter::TakeDamage);
+	DamageComponent->OnDeath.AddDynamic(this, &APlayerCharacter::DespawnPlayer);
 
 	CurrentMovementState = EPlayerMovementState::standing;
 
@@ -58,13 +62,18 @@ void APlayerCharacter::BeginPlay()
 	Server_SpawnDefaultWeapon();
 }
 
+bool APlayerCharacter::IsDead()
+{
+	return bIsDead;
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	
 	Super::Tick(DeltaTime);
 	
-	if (!bIsDead && bIsUsingMouse) {
+	if (!IsDead() && bIsUsingMouse) {
 		//get cursor in world space
 		FVector HitLocation = GetHitResultUnderCursor();
 		//rotate character
@@ -93,7 +102,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	//small hack to keep us from falling infinitly off the map for now. 
 	//Bounds checking should probobly be a more universal thing, as we should use it to despawn other items
 	if (playerManager && playerManager->IsOutOfBounds(GetActorLocation())) {
-		Damage(99999999999);
+		DamageComponent->Damage(99999999999);
 	}
 
 }
@@ -263,12 +272,11 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 
 void APlayerCharacter::DespawnPlayer()
 {
-	CurrentHealth = 0;
-	currentRespawnTime = respawnTime;
-	bIsDead = true;
-	StopAttacking();
-	SetActorLocation(playerManager->GetPlayerDeathPos());
 	if (HasAuthority()) {
+		bIsDead = true;
+		currentRespawnTime = respawnTime;
+		StopAttacking();
+		SetActorLocation(playerManager->GetPlayerDeathPos());
 		GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 	}
 }
@@ -281,32 +289,21 @@ void APlayerCharacter::RespawnPlayer()
 			GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 			return;
 		}
+		//if the respawn timer is fulfilled, then actually respawn the player here
 		else {
-			CurrentHealth = MaxHealth;
 			bIsDead = false;
+			DamageComponent->Reset();
 			SetActorLocation(playerManager->GetPlayerSpawnPoint());
 		}
 	}
 }
 
-void APlayerCharacter::Damage(float damageToTake)
+void APlayerCharacter::TakeDamage(float damageToTake)
 {
-	if (bIsDead) {
-		return;
-	}
 	if (HasAuthority()) {
 		GetCharacterMovement()->MaxWalkSpeed = InjuredMoveSpeed;
 		GetWorld()->GetTimerManager().SetTimer(damageSlowTimerHandle, this, &APlayerCharacter::ResetMovementSpeed, DamageSlowTime, false);
-		CurrentHealth -= damageToTake;
-		if (CurrentHealth <= 0) {
-			DespawnPlayer();
-		}
 	}
-}
-
-float APlayerCharacter::GetHealth()
-{
-	return CurrentHealth;
 }
 
 FVector APlayerCharacter::GetHitResultUnderCursor()
@@ -505,4 +502,5 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(APlayerCharacter, EquippedWeapon);
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 	DOREPLIFETIME(APlayerCharacter, bIsUsingMouse);
+	DOREPLIFETIME(APlayerCharacter, bIsDead);
 }
