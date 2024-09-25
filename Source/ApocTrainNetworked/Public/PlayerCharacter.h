@@ -53,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* PauseMenuAction;
+
 	//INTERACTION MECHANICS
 	class ACarryableActor* carriedObject;
 	class USceneComponent* carrySlot;
@@ -170,6 +173,9 @@ protected:
 	float MaxMoveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float RotationSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float InjuredMoveSpeed;
 
 	UFUNCTION()
@@ -178,6 +184,8 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void TogglePauseMenu();
 public:	
 
 	bool IsDead();

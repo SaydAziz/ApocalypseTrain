@@ -12,6 +12,7 @@ UDamageComponent::UDamageComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	MaxHealth = 100.0f;
 }
 
 
