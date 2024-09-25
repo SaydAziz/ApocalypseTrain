@@ -22,8 +22,15 @@ protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	bool bNegateDamage;
 
 public:	
+
+	/// <summary>
+	/// Used to ignore damage calls, for example if a character is dead they should not be allowed to keep taking damage
+	/// </summary>
+	/// <param name="canDamage"></param>
+	void SetNegateDamageTrue();
 
 	UPROPERTY(ReplicatedUsing= OnRep_Health)
 	float CurrentHealth;

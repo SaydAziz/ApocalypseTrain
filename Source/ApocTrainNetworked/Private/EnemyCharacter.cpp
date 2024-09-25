@@ -125,6 +125,7 @@ void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
 void AEnemyCharacter::OnDespawn()
 {
 	bIsDead = true;
+	DamageComponent->SetNegateDamageTrue();
 	if (AIController)
 		AIController->SetIsDead(bIsDead);
 	GetCharacterMovement()->GravityScale = 0;

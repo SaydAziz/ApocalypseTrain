@@ -101,9 +101,6 @@ protected:
 
 	AWeapon* WeaponOnGround;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float CurrentHealth;
-
 
 	//DASH MECHANICS
 	UPROPERTY(EditAnywhere, Category = Dash)
@@ -167,9 +164,6 @@ protected:
 	void ResetMovementSpeed();
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage", meta = (ToolTip = "How long the player is slowed down for after taking damage"))
 	float DamageSlowTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = health)
-	float MaxHealth;
 
 	//MOVEMENT
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")

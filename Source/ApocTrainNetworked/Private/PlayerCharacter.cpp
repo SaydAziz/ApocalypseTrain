@@ -57,8 +57,8 @@ void APlayerCharacter::BeginPlay()
 
 	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
 	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+	DamageComponent->Reset();
 	MaxMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	CurrentHealth = MaxHealth;
 	Server_SpawnDefaultWeapon();
 }
 
@@ -274,6 +274,7 @@ void APlayerCharacter::DespawnPlayer()
 {
 	if (HasAuthority()) {
 		bIsDead = true;
+		DamageComponent->SetNegateDamageTrue();
 		currentRespawnTime = respawnTime;
 		StopAttacking();
 		SetActorLocation(playerManager->GetPlayerDeathPos());

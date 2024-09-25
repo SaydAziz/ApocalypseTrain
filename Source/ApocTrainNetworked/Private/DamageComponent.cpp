@@ -22,6 +22,11 @@ void UDamageComponent::BeginPlay()
 	Reset();
 }
 
+void UDamageComponent::SetNegateDamageTrue()
+{
+	bNegateDamage = true;
+}
+
 void UDamageComponent::OnRep_Health()
 {
 	OnDamageTaken.Broadcast(previousDamageTaken);
@@ -44,6 +49,9 @@ float UDamageComponent::GetMaxHealth()
 
 void UDamageComponent::Damage(float damageToTake)
 {
+	if (bNegateDamage) {
+		return;
+	}
 	if (GetOwner()->HasAuthority())
 	{
 		previousDamageTaken = damageToTake;
@@ -67,6 +75,7 @@ void UDamageComponent::ServerDamage_Implementation(float damageToTake)
 void UDamageComponent::Reset()
 {
 	CurrentHealth = MaxHealth;
+	bNegateDamage = false;
 }
 
 
