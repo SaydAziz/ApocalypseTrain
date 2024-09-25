@@ -43,6 +43,9 @@ void UFlashComponent::GetMaterialsToFlash()
 void UFlashComponent::OnRep_MaterialColor()
 {
 	//should probobly loop all
+	if (FlashMaterials.IsEmpty()) {
+		return;
+	}
 	if (FlashMaterials[0] == NULL) {
 		return;
 	}

@@ -24,7 +24,7 @@ enum class EPlayerActionState : uint8
 
 
 UCLASS()
-class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter, public IDamagable
+class APOCTRAINNETWORKED_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -66,7 +66,13 @@ public:
 	int GetPlayerIndex();
 	//void SetPlayerIndex(int index);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UDamageComponent* DamageComponent;
+
 protected:
+
+	UPROPERTY(Replicated)
+	bool bIsDead;
 
 	class APlayerManager* playerManager;
 
@@ -148,8 +154,7 @@ protected:
 	void RotateCharacterToLookAt(const FVector TargetPosition);
 
 	//SPAWNING
-	bool bIsDead;
-
+	UFUNCTION()
 	void DespawnPlayer();
 	void RespawnPlayer();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Respawn)
@@ -180,6 +185,8 @@ protected:
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:	
+
+	bool IsDead();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -193,13 +200,8 @@ public:
 	bool IsAttacking();
 	bool IsFacingWall();
 
-	virtual void Damage(float damageToTake);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Stats")
-	virtual float GetHealth_Implementation();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stats")
-	virtual float GetMaxHealth_Implementation();
+	UFUNCTION()
+	virtual void TakeDamage(float damageToTake);
 
 	UFUNCTION(Server, Unreliable)
 	void Server_DropCarriedItem();
