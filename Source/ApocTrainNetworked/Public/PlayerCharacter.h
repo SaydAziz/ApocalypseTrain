@@ -173,6 +173,9 @@ protected:
 	float MaxMoveSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float RotationSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float InjuredMoveSpeed;
 
 	UFUNCTION()

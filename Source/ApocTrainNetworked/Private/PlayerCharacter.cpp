@@ -33,6 +33,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CurrentMovementState = EPlayerMovementState::standing;
 
+	RotationSpeed = 10;
 	DashImpulseStrength = 2000.0f;
 	DashCooldown = 1.0f;
 	bCanDash = true;
@@ -265,7 +266,7 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 		FRotator TargetRotation = Direction.Rotation();
 
 		// Smoothly interpolate the rotation for smoother turning
-		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f);
+		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), RotationSpeed);
 		if (Controller) {
 			Controller->SetControlRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
 		}
