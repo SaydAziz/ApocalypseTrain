@@ -39,7 +39,7 @@ void AFuel::BeginPlay()
 void AFuel::OnFuelBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HasAuthority()) {
-		GEngine->AddOnScreenDebugMessage(-1, 2.0, FColor::Purple, OtherComp->GetName());
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0, FColor::Purple, OtherComp->GetName());
 		if (UFuelComponent* fuelComponent = OtherActor->FindComponentByClass<UFuelComponent>()) {
 			LastOverlappedDeposit = fuelComponent;
 		}

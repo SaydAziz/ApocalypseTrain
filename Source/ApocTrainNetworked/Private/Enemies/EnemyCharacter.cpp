@@ -151,7 +151,7 @@ void AEnemyCharacter::ExecuteMeleeAttack()
 {
 	//FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(CurrentState));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, TEXT("ATTACKING!"));
 	bCanAttack = false;
 	SetEnemyState(EEnemyState::attacking);
 	GetWorldTimerManager().SetTimer(AttackRateTimerHandle, this, &AEnemyCharacter::ResetAttack, EnemyData->AttackRate, false);
@@ -206,7 +206,7 @@ void AEnemyCharacter::SetEnemyState(EEnemyState NewState)
 		if (CurrentState != NewState)
 		{
 			FString StateString = FString::Printf(TEXT("%d"), static_cast<int32>(NewState));
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, StateString);
 			CurrentState = NewState;
 		}
 	}

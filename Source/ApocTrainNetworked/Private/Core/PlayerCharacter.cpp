@@ -466,7 +466,7 @@ void APlayerCharacter::SetPlayerMovementState(EPlayerMovementState NewMovementSt
 	if (CurrentMovementState != NewMovementState)
 	{
 		CurrentMovementState = NewMovementState;
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentMovementState));
+		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to: %d"), CurrentMovementState));
 
 		//Add transition logic here
 	}

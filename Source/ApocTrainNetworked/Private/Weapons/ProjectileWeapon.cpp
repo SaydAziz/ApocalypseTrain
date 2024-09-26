@@ -111,7 +111,7 @@ void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
 	if (CurrentWeaponState != NewWeaponState)
 	{
 		CurrentWeaponState = NewWeaponState;
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
+		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
 
 		//Add transition logic here
 	}
