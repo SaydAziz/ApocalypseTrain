@@ -19,7 +19,8 @@ public class ApocTrainNetworked : ModuleRules
 			"GameplayTasks",
 			"NavigationSystem",
             "Slate",        // using to detect if gamepad is connected
-			"SlateCore"		// using to detect if gamepad is connected
+			"SlateCore",		// using to detect if gamepad is connected
+			"UMG",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
