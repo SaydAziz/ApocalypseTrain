@@ -50,7 +50,7 @@ public:
 	void Multi_SetRenderDepth(bool renderdepth);
 	void Multi_SetRenderDepth_Implementation(bool renderdepth);
 
-	UFUNCTION(Server, Unreliable)
+	UFUNCTION(Server, Reliable)
 	virtual void Server_DropObject(FVector directionToLaunch, FVector dropperLocation);
 	virtual void Server_DropObject_Implementation(FVector directionToLaunch, FVector dropperLocation);
 

@@ -28,8 +28,6 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
-	UPROPERTY()
-	class UFuelComponent* LastOverlappedDeposit;
 
 	UFUNCTION(BlueprintCallable)
 	void OnFuelDeposited();

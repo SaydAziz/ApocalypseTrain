@@ -37,10 +37,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGameState(EGameState stateToSet);
 
+	UFUNCTION(BlueprintCallable)
+	EGameState GetGameState();
+	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EGameState CurrentGameState;
-
-protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class APlayerManager* playerManager;
 

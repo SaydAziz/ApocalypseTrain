@@ -45,7 +45,7 @@ void ATrain::Tick(float DeltaTime)
 
 void ATrain::CheckGameState()
 {
-	switch (gameState->CurrentGameState) {
+	switch (gameState->GetGameState()) {
 		case EGameState::lobby:
 			break;
 		case EGameState::traveling:

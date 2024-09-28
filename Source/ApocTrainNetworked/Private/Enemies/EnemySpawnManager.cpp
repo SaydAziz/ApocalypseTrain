@@ -35,6 +35,7 @@ void AEnemySpawnManager::SpawnEnemiesOnChunk(float Ypos)
 				p->SpawnObject(FVector(i * 50, Ypos, 40));
 			}
 		}
+		EnemiesPerChunk += 1;
 	}
 }
 
