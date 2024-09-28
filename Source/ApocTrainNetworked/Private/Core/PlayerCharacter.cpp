@@ -79,7 +79,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		FVector HitLocation = GetHitResultUnderCursor();
 		//rotate character
 		RotateCharacterToLookAt(HitLocation);
-	/*	if (Controller) {
+		/*if (Controller) {
 
 			UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
 		}*/
@@ -433,7 +433,7 @@ void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 {
 
-	if (Weapon->GetAttachParentActor() == nullptr)
+	if (!Cast<APlayerCharacter>(Weapon->GetAttachParentActor()))
 	{
 		if (EquippedWeapon)
 		{
