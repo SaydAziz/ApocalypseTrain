@@ -33,6 +33,11 @@ void AATGameState::SetGameState(EGameState stateToSet)
 	CurrentGameState = stateToSet;
 }
 
+EGameState AATGameState::GetGameState()
+{
+	return CurrentGameState;
+}
+
 
 
 

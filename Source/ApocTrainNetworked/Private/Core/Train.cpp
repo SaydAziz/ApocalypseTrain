@@ -27,6 +27,7 @@ void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
 	gameState = GetWorld()->GetGameState<AATGameState>();
+	startingFuel = fuelComponent->CurrentFuel;
 }
 
 
@@ -45,8 +46,11 @@ void ATrain::Tick(float DeltaTime)
 
 void ATrain::CheckGameState()
 {
-	switch (gameState->CurrentGameState) {
+	switch (gameState->GetGameState()) {
 		case EGameState::lobby:
+			if (fuelComponent->CurrentFuel > startingFuel) {
+				gameState->SetGameState(EGameState::traveling);
+			}
 			break;
 		case EGameState::traveling:
 			if (IsTrainStopped() || IsStopping()) {

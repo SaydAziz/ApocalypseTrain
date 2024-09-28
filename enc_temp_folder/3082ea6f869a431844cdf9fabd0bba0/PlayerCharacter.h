@@ -87,7 +87,7 @@ protected:
 	EPlayerMovementState GetPlayerMovementState() const;
 
 	//INTERACT MECHANICS
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EPlayerActionState CurrentActionState;
 
 	void SetPlayerActionState(EPlayerActionState NewActionState);
