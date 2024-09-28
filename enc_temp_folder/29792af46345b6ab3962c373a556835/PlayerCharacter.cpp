@@ -507,5 +507,4 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 	DOREPLIFETIME(APlayerCharacter, bIsUsingMouse);
 	DOREPLIFETIME(APlayerCharacter, bIsDead);
-	DOREPLIFETIME(APlayerCharacter, CurrentActionState);
 }
