@@ -27,6 +27,7 @@ void ATrain::BeginPlay()
 {
 	Super::BeginPlay();
 	gameState = GetWorld()->GetGameState<AATGameState>();
+	startingFuel = fuelComponent->CurrentFuel;
 }
 
 
@@ -47,6 +48,9 @@ void ATrain::CheckGameState()
 {
 	switch (gameState->GetGameState()) {
 		case EGameState::lobby:
+			if (fuelComponent->CurrentFuel > startingFuel) {
+				gameState->SetGameState(EGameState::traveling);
+			}
 			break;
 		case EGameState::traveling:
 			if (IsTrainStopped() || IsStopping()) {

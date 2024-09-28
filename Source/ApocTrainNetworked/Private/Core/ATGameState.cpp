@@ -21,13 +21,13 @@ void AATGameState::SetGameState(EGameState stateToSet)
 {
 	switch (stateToSet) {
 		case EGameState::Encounter:
-			if (CurrentGameState == EGameState::traveling) {
-				OnDifficultyIncrease.Broadcast();
-			}
 			break;
 		case EGameState::lobby:
 			break;
 		case EGameState::traveling:
+			if (CurrentGameState == EGameState::Encounter) {
+				OnDifficultyIncrease.Broadcast();
+			}
 			break;
 	}
 	CurrentGameState = stateToSet;

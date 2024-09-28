@@ -52,6 +52,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	float currentTrainSpeed;
 
+	float startingFuel;
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
