@@ -27,7 +27,10 @@ void AFuel::Server_DropObject_Implementation(FVector directionToLaunch, FVector 
 		if (Actor) {
 			if (UFuelComponent* fuelComp = Actor->FindComponentByClass<UFuelComponent>())
 			{
-				fuelComp->Server_AddFuel(this);
+				if(fuelComp->IsInsideDeposit(GetActorLocation()))
+				{
+					fuelComp->Server_AddFuel(this);
+				}
 			}
 		}
 	}
