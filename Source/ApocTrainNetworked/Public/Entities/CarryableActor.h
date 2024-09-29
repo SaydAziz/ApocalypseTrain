@@ -22,6 +22,8 @@ class APOCTRAINNETWORKED_API ACarryableActor : public AInteractableActor
 	
 public:
 
+	ACarryableActor();
+
 	virtual void BeginPlay() override;
 
 	ECarriedState carriedState;
@@ -59,6 +61,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly);
 	bool wasDropped;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UPulseComponent* pulseComponent;
 
 	virtual bool ShouldUpdateOverlappingPlayers() override;
 };

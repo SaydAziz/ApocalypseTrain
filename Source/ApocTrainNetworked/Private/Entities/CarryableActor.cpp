@@ -2,7 +2,13 @@
 
 #include "Entities/CarryableActor.h"
 #include "Core/PlayerCharacter.h"
+#include "ATComponents/PulseComponent.h"
 
+
+ACarryableActor::ACarryableActor()
+{
+	pulseComponent = CreateDefaultSubobject<UPulseComponent>(TEXT("PulseComponent"));
+}
 
 void ACarryableActor::BeginPlay()
 {
@@ -78,7 +84,9 @@ void ACarryableActor::OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor
 	if (wasDropped == true) {
 		wasDropped = false;
 		carriedState = ECarriedState::Idle;
-		//this is where we call the pulse code
+		if (pulseComponent) {
+			pulseComponent->Pulse();
+		}
 	}
 }
 
