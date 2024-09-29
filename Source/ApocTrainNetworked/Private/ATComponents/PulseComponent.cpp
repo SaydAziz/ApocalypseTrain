@@ -67,6 +67,8 @@ void UPulseComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UPulseComponent::Pulse()
 {
-	PulseTimeline->PlayFromStart();
+	if (PulseTimeline) {
+		PulseTimeline->PlayFromStart();
+	}
 }
 
