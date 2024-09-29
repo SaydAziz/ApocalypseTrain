@@ -22,7 +22,7 @@ void UPulseComponent::BeginPlay()
 	SetIsReplicated(true);
 	GetMeshesToPulse();
 	// ...
-	if (FloatCurve)
+	if (FloatCurve && PulseTimeline)
 	{
 		FOnTimelineFloat TimelineProgress;
 		PulseTimeline->SetIsReplicated(true);
