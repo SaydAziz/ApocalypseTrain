@@ -77,6 +77,16 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (!IsDead() && bIsUsingMouse) {
 		//get cursor in world space
 		FVector HitLocation = GetHitResultUnderCursor();
+		/*DrawDebugLine(
+			GetWorld(),
+			GetActorLocation(),
+			HitLocation,
+			FColor::Blue,
+			false,
+			-1.0f,
+			0,
+			1.0f
+		);*/
 		//rotate character
 		RotateCharacterToLookAt(HitLocation);
 		/*if (Controller) {
@@ -273,6 +283,43 @@ void APlayerCharacter::RotateCharacterToLookAt( FVector TargetPosition)
 	}
 }
 
+FVector APlayerCharacter::GetHitResultUnderCursor()
+{
+	if (Controller && IsLocallyControlled())
+	{
+		// Get the player controller
+		APlayerController* PC = Cast<APlayerController>(Controller);
+		if (PC)
+		{
+			// Get the actor's Z position to create the plane
+			float ActorZ = GetActorLocation().Z;
+			// Get the cursor screen location
+			float MouseX, MouseY;
+			PC->GetMousePosition(MouseX, MouseY);
+			// Deproject the cursor screen location to world space
+			FVector WorldLocation, WorldDirection;
+			if (PC->DeprojectScreenPositionToWorld(MouseX, MouseY, WorldLocation, WorldDirection))
+			{
+				// Now we need to find the intersection point with the Z plane
+				FVector PlaneNormal = FVector(0, 0, 1); // Plane is horizontal, normal points up
+				FVector PlanePoint = FVector(0, 0, ActorZ); // Point on the plane (Z position of actor)
+				// Calculate the distance along the WorldDirection to the plane
+				float Distance = (PlanePoint.Z - WorldLocation.Z) / WorldDirection.Z;
+				if (Distance > 0) // Ensure we're not hitting something behind the camera
+				{
+					// Get the intersection point on the plane
+					FVector HitLocation = WorldLocation + WorldDirection * Distance;
+					return HitLocation;
+				}
+			}
+		}
+	}
+
+	// Return a zero vector if the hit result failed
+	return FVector(0, 0, 0);
+}
+
+
 void APlayerCharacter::DespawnPlayer()
 {
 	if (HasAuthority()) {
@@ -308,19 +355,6 @@ void APlayerCharacter::TakeDamage(float damageToTake)
 		GetCharacterMovement()->MaxWalkSpeed = InjuredMoveSpeed;
 		GetWorld()->GetTimerManager().SetTimer(damageSlowTimerHandle, this, &APlayerCharacter::ResetMovementSpeed, DamageSlowTime, false);
 	}
-}
-
-FVector APlayerCharacter::GetHitResultUnderCursor()
-{
-	if (Controller && IsLocallyControlled())
-	{
-		FHitResult HitResult;
-		if (Cast<APlayerController>(Controller)->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
-		{
-			return HitResult.Location;
-		}
-	}
-	return FVector(0,0,0);
 }
 
 void APlayerCharacter::DoDash(const FInputActionValue& Value)

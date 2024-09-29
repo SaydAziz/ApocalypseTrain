@@ -68,9 +68,6 @@ void AProjectileWeapon::Attack()
 				if (UDamageComponent* dmgComp = HitResult.GetActor()->GetComponentByClass<UDamageComponent>()) {
 					dmgComp->Damage(Data->Damage);
 				}
-				/*if (IDamagable* damagableActor = Cast<IDamagable>(HitResult.GetActor())) {
-					damagableActor->Damage(Data->Damage);
-				}*/
 			}
 		}
 
