@@ -11,7 +11,6 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionStateChange, uint8, state);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipWeapon);
 
 
 UENUM(BlueprintType)
@@ -78,10 +77,6 @@ public:
 	//PLAYER STATE
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnActionStateChange OnActionStateChange;
-
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnEquipWeapon OnEquipWeapon;
-
 
 protected:
 

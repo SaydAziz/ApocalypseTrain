@@ -26,12 +26,6 @@ void AWeapon::BeginPlay()
 	
 }
 
-void AWeapon::BeginDestroy()
-{
-	Super::BeginDestroy();
-	OnAttack.Clear();
-}
-
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {

@@ -72,7 +72,6 @@ void AProjectileWeapon::Attack()
 		}
 
 		Multicast_AttackEffects();
-		OnAttack.Broadcast();
 	}
 }
 

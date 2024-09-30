@@ -496,7 +496,6 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 		EquippedWeapon->AttachToComponent(characterMesh, AttachmentRules, "WeaponSocket");
 		EquippedWeapon->Equip();
 		EquippedWeapon->SetOwner(this);
-		OnEquipWeapon.Broadcast();
 	}
 }
 
