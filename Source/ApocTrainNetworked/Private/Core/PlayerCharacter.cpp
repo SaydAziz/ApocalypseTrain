@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Core/ATPlayerController.h"
 #include "Core/PlayerManager.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "ATComponents/DamageComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -54,7 +55,6 @@ void APlayerCharacter::SetupStimulusSource()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
 
 	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
 	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
@@ -94,8 +94,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 			UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
 		}*/
+
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Dead: %d"), bIsDead));
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("FacingWall: %d"), IsFacingWall()));
 
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
@@ -171,7 +172,7 @@ bool APlayerCharacter::IsAttacking()
 bool APlayerCharacter::IsFacingWall()
 {
 	FVector start = GetActorLocation();
-	FVector forward = carrySlot->GetComponentLocation() - GetActorLocation();
+	FVector forward = characterMesh->GetSocketByName(FName("CarrySocket"))->GetSocketLocation(characterMesh) - GetActorLocation();
 	forward.Z = 0;
 	FVector end = start + (forward * 1.2);
 	FHitResult hit;
@@ -216,7 +217,7 @@ void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToC
 	}
 	SetPlayerActionState(EPlayerActionState::carrying);
 	carriedObject = itemToCarry;
-	itemToCarry->Server_OnPickedUp(carrySlot);
+	itemToCarry->Server_OnPickedUp(characterMesh);
 	
 }
 

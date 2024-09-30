@@ -36,7 +36,7 @@ bool ACarryableActor::IsCarried()
 	return carriedState == ECarriedState::Carried;
 }
 
-void ACarryableActor::Server_OnPickedUp_Implementation(USceneComponent* carrier)
+void ACarryableActor::Server_OnPickedUp_Implementation(USkeletalMeshComponent* carrier)
 {
 	SetReplicateMovement(true);
 	SetReplicates(true);
@@ -44,9 +44,11 @@ void ACarryableActor::Server_OnPickedUp_Implementation(USceneComponent* carrier)
 		return;
 	}
 	PhysicsComponent->SetSimulatePhysics(false);
-	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
-	AttachToComponent(carrier, rules);
-	SetActorLocation(carrier->GetComponentLocation());
+	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
+	
+	SetActorLocation(carrier->GetSocketTransform("CarrySocket").GetLocation());
+	AttachToComponent(carrier, rules, "CarrySocket");
+
 	Multi_SetRenderDepth(false);
 }
 

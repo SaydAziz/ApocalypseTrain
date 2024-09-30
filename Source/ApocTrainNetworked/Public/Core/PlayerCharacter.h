@@ -61,7 +61,6 @@ public:
 
 	//INTERACTION MECHANICS
 	class ACarryableActor* carriedObject;
-	class USceneComponent* carrySlot;
 	class USkeletalMeshComponent* characterMesh;
 
 	UPROPERTY(Replicated, BlueprintReadOnly)
