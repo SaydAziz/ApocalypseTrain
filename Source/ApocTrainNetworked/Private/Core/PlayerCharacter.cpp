@@ -58,6 +58,7 @@ void APlayerCharacter::BeginPlay()
 
 	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
 	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+
 	DamageComponent->Reset();
 	MaxMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	Server_SpawnDefaultWeapon();
@@ -529,7 +530,13 @@ void APlayerCharacter::SetPlayerActionState(EPlayerActionState NewActionState)
 				break;
 		}
 		CurrentActionState = NewActionState;
+		OnActionStateChange.Broadcast(static_cast<uint8>(CurrentActionState));
 	}
+}
+
+EPlayerActionState APlayerCharacter::GetPlayerActionState() const
+{
+	return CurrentActionState;
 }
 
 
