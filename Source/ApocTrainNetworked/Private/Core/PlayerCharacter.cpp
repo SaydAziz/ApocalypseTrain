@@ -39,6 +39,9 @@ APlayerCharacter::APlayerCharacter()
 	DashCooldown = 1.0f;
 	bCanDash = true;
 
+	upwardForce = 0.5f;
+	forwardMultiplier = 1.0f;
+
 	
 }
 
@@ -197,13 +200,23 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 {
 	if (IsCarryingItem()) {
 		if (carriedObject != NULL) {
-			float upwardForce = 0.5f;
 			if (IsFacingWall()) {
 				carriedObject->SetActorLocation(GetActorLocation());
 				carriedObject->Server_DropObject((this->GetActorForwardVector() * -1) * 0.2f * throwVelocity, carriedObject->GetActorLocation());
 			}
 			else {
-				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, carriedObject->GetActorLocation());
+				float DotProduct = GetActorForwardVector().Dot(GetCharacterMovement()->Velocity.GetSafeNormal());
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Forward: %s"), *GetActorForwardVector().ToString()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Vel: %s"), *GetCharacterMovement()->Velocity.GetSafeNormal().ToString()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Dot: %f"), DotProduct));
+				if (DotProduct > 0)
+				{
+					carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity * (forwardMultiplier + DotProduct), carriedObject->GetActorLocation());
+				}
+				else
+				{
+					carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, carriedObject->GetActorLocation());
+				}
 			}
 		}
 		SetPlayerActionState(EPlayerActionState::idle);

@@ -103,8 +103,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="State")
 	EPlayerActionState GetPlayerActionState() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
 	float throwVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
+	float forwardMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
+	float upwardForce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Weapon)
 	AWeapon* EquippedWeapon;
@@ -113,6 +119,7 @@ protected:
 	TSubclassOf<AWeapon> DefaultWeapon;
 
 	AWeapon* WeaponOnGround;
+
 
 
 	//DASH MECHANICS
