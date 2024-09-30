@@ -45,8 +45,8 @@ public:
 
 
 	UFUNCTION(Server, Unreliable)
-	void Server_OnPickedUp(USceneComponent* carrier);
-	void Server_OnPickedUp_Implementation(USceneComponent* carrier);
+	void Server_OnPickedUp(USkeletalMeshComponent* carrier);
+	void Server_OnPickedUp_Implementation(USkeletalMeshComponent* carrier);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multi_SetRenderDepth(bool renderdepth);

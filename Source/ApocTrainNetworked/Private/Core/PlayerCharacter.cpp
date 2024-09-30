@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Core/ATPlayerController.h"
 #include "Core/PlayerManager.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "ATComponents/DamageComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -38,6 +39,9 @@ APlayerCharacter::APlayerCharacter()
 	DashCooldown = 1.0f;
 	bCanDash = true;
 
+	upwardForce = 0.5f;
+	forwardMultiplier = 1.0f;
+
 	
 }
 
@@ -54,10 +58,10 @@ void APlayerCharacter::SetupStimulusSource()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	carrySlot = FindComponentByTag<USceneComponent>("CarrySlot");
 
 	CollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapBegin);
 	CollisionCapsule->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnOverlapEnd);
+
 	DamageComponent->Reset();
 	MaxMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	Server_SpawnDefaultWeapon();
@@ -93,8 +97,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 			UE_LOG(LogTemp, Log, TEXT("Player index: %d Game Player Index: %d"), PlayerIndex, Cast<AATPlayerController>(Controller)->LocalPlayerIndex);
 		}*/
+
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Dead: %d"), bIsDead));
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("FacingWall: %d"), IsFacingWall()));
 
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
@@ -170,7 +175,7 @@ bool APlayerCharacter::IsAttacking()
 bool APlayerCharacter::IsFacingWall()
 {
 	FVector start = GetActorLocation();
-	FVector forward = carrySlot->GetComponentLocation() - GetActorLocation();
+	FVector forward = characterMesh->GetSocketByName(FName("CarrySocket"))->GetSocketLocation(characterMesh) - GetActorLocation();
 	forward.Z = 0;
 	FVector end = start + (forward * 1.2);
 	FHitResult hit;
@@ -195,13 +200,23 @@ void APlayerCharacter::Server_DropCarriedItem_Implementation()
 {
 	if (IsCarryingItem()) {
 		if (carriedObject != NULL) {
-			float upwardForce = 0.5f;
 			if (IsFacingWall()) {
 				carriedObject->SetActorLocation(GetActorLocation());
 				carriedObject->Server_DropObject((this->GetActorForwardVector() * -1) * 0.2f * throwVelocity, carriedObject->GetActorLocation());
 			}
 			else {
-				carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, carriedObject->GetActorLocation());
+				float DotProduct = GetActorForwardVector().Dot(GetCharacterMovement()->Velocity.GetSafeNormal());
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Forward: %s"), *GetActorForwardVector().ToString()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Vel: %s"), *GetCharacterMovement()->Velocity.GetSafeNormal().ToString()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Dot: %f"), DotProduct));
+				if (DotProduct > 0)
+				{
+					carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity * (forwardMultiplier + DotProduct), carriedObject->GetActorLocation());
+				}
+				else
+				{
+					carriedObject->Server_DropObject(((this->GetActorForwardVector()) + FVector(0, 0, upwardForce)) * throwVelocity, carriedObject->GetActorLocation());
+				}
 			}
 		}
 		SetPlayerActionState(EPlayerActionState::idle);
@@ -215,7 +230,7 @@ void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToC
 	}
 	SetPlayerActionState(EPlayerActionState::carrying);
 	carriedObject = itemToCarry;
-	itemToCarry->Server_OnPickedUp(carrySlot);
+	itemToCarry->Server_OnPickedUp(characterMesh);
 	
 }
 
@@ -481,6 +496,7 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 		EquippedWeapon->AttachToComponent(characterMesh, AttachmentRules, "WeaponSocket");
 		EquippedWeapon->Equip();
 		EquippedWeapon->SetOwner(this);
+		OnEquipWeapon.Broadcast();
 	}
 }
 
@@ -529,7 +545,13 @@ void APlayerCharacter::SetPlayerActionState(EPlayerActionState NewActionState)
 				break;
 		}
 		CurrentActionState = NewActionState;
+		OnActionStateChange.Broadcast(static_cast<uint8>(CurrentActionState));
 	}
+}
+
+EPlayerActionState APlayerCharacter::GetPlayerActionState() const
+{
+	return CurrentActionState;
 }
 
 

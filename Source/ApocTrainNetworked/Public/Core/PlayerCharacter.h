@@ -9,6 +9,11 @@
 #include "Components/CapsuleComponent.h"
 #include "PlayerCharacter.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionStateChange, uint8, state);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipWeapon);
+
+
 UENUM(BlueprintType)
 enum class EPlayerMovementState : uint8
 {
@@ -57,7 +62,6 @@ public:
 
 	//INTERACTION MECHANICS
 	class ACarryableActor* carriedObject;
-	class USceneComponent* carrySlot;
 	class USkeletalMeshComponent* characterMesh;
 
 	UPROPERTY(Replicated, BlueprintReadOnly)
@@ -70,6 +74,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UDamageComponent* DamageComponent;
+	
+	//PLAYER STATE
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnActionStateChange OnActionStateChange;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnEquipWeapon OnEquipWeapon;
+
 
 protected:
 
@@ -79,21 +91,31 @@ protected:
 	class APlayerManager* playerManager;
 
 	//PLAYER STATE
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EPlayerMovementState CurrentMovementState;
 
 	void SetPlayerMovementState(EPlayerMovementState NewMovementState);
+
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	EPlayerMovementState GetPlayerMovementState() const;
 
 	//INTERACT MECHANICS
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
 	EPlayerActionState CurrentActionState;
 
 	void SetPlayerActionState(EPlayerActionState NewActionState);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
+	UFUNCTION(BlueprintCallable, Category="State")
+	EPlayerActionState GetPlayerActionState() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
 	float throwVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
+	float forwardMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Throwing)
+	float upwardForce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Weapon)
 	AWeapon* EquippedWeapon;
@@ -102,6 +124,7 @@ protected:
 	TSubclassOf<AWeapon> DefaultWeapon;
 
 	AWeapon* WeaponOnGround;
+
 
 
 	//DASH MECHANICS
