@@ -51,8 +51,10 @@ void AProjectileWeapon::Attack()
 		GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
 		FHitResult HitResult = FHitResult();
 
-		FVector StartTrace = GetAttachParentActor()->GetActorLocation();
-		FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
+		//FVector StartTrace = GetAttachParentActor()->GetActorLocation();
+		//FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
+		FVector StartTrace = GetActorLocation();
+		FVector ForwardVector = GetActorForwardVector();
 		FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
 
 		FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
@@ -60,7 +62,7 @@ void AProjectileWeapon::Attack()
 		TraceParams->AddIgnoredActor(GetAttachParentActor());
 		TraceParams->AddIgnoredActor(this);
 
-		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 5.0f);
+		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 15.0f);
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
 		{
 			if (HitResult.GetActor()) {
@@ -72,7 +74,6 @@ void AProjectileWeapon::Attack()
 		}
 
 		Multicast_AttackEffects();
-		OnAttack.Broadcast();
 	}
 }
 
@@ -80,8 +81,9 @@ void AProjectileWeapon::Multicast_AttackEffects_Implementation()
 {
 	if (Data->BulletTracer)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, WeaponMesh->GetSocketLocation("MuzzleSocket"), GetAttachParentActor()->GetActorForwardVector().Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, WeaponMesh->GetSocketLocation("MuzzleSocket"), GetActorForwardVector().Rotation());
 	}
+	OnAttack.Broadcast();
 }
 
 void AProjectileWeapon::ResetAttack()
