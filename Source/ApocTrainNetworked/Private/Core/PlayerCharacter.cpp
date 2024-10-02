@@ -496,8 +496,13 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 		EquippedWeapon->AttachToComponent(characterMesh, AttachmentRules, "WeaponSocket");
 		EquippedWeapon->Equip();
 		EquippedWeapon->SetOwner(this);
-		OnEquipWeapon.Broadcast();
+		Multi_EquipWeapon(Weapon);
 	}
+}
+
+void APlayerCharacter::Multi_EquipWeapon_Implementation(AWeapon* Weapon)
+{
+	Weapon->OnAttack.AddDynamic(this, &APlayerCharacter::DoAttackVisuals);
 }
 
 int APlayerCharacter::GetPlayerIndex()

@@ -11,8 +11,6 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionStateChange, uint8, state);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipWeapon);
-
 
 UENUM(BlueprintType)
 enum class EPlayerMovementState : uint8
@@ -78,10 +76,6 @@ public:
 	//PLAYER STATE
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnActionStateChange OnActionStateChange;
-
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnEquipWeapon OnEquipWeapon;
-
 
 protected:
 
@@ -224,6 +218,9 @@ public:
 	bool IsAttacking();
 	bool IsFacingWall();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void DoAttackVisuals();
+
 	UFUNCTION()
 	virtual void TakeDamage(float damageToTake);
 
@@ -241,6 +238,9 @@ public:
 
 	UFUNCTION(Server, Unreliable)
 	void Server_EquipWeapon(AWeapon* Weapon);
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_EquipWeapon(AWeapon* Weapon);
 
 	UFUNCTION(Server, Unreliable)
 	void Server_SpawnDefaultWeapon();
