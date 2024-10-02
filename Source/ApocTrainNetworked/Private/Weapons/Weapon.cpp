@@ -71,6 +71,8 @@ void AWeapon::Equip()
 
 void AWeapon::Highlight(bool val)
 {
-	WeaponMesh->SetRenderCustomDepth(val);
+	if (WeaponMesh) {
+		WeaponMesh->SetRenderCustomDepth(val);
+	}
 }
 

@@ -338,6 +338,7 @@ FVector APlayerCharacter::GetHitResultUnderCursor()
 void APlayerCharacter::DespawnPlayer()
 {
 	if (HasAuthority()) {
+		Server_DropCarriedItem();
 		bIsDead = true;
 		DamageComponent->SetNegateDamageTrue();
 		currentRespawnTime = respawnTime;
@@ -470,6 +471,9 @@ void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 			}
 		}
 	}
+	if (OtherComp->ComponentHasTag("KILLBARRIER")) {
+		DamageComponent->Damage(9999999999999);
+	}
 }
 
 void APlayerCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -504,8 +508,10 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 
 void APlayerCharacter::Multi_EquipWeapon_Implementation(AWeapon* Weapon)
 {
-	Weapon->Highlight(false);
-	Weapon->OnAttack.AddDynamic(this, &APlayerCharacter::DoAttackVisuals);
+	if (Weapon) {
+		Weapon->Highlight(false);
+		Weapon->OnAttack.AddDynamic(this, &APlayerCharacter::DoAttackVisuals);
+	}
 }
 
 int APlayerCharacter::GetPlayerIndex()
