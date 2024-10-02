@@ -338,6 +338,7 @@ FVector APlayerCharacter::GetHitResultUnderCursor()
 void APlayerCharacter::DespawnPlayer()
 {
 	if (HasAuthority()) {
+		Server_DropCarriedItem();
 		bIsDead = true;
 		DamageComponent->SetNegateDamageTrue();
 		currentRespawnTime = respawnTime;
@@ -462,11 +463,16 @@ void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 		if (OtherActor != EquippedWeapon)
 		{
 			WeaponOnGround = Cast<AWeapon>(OtherActor);
-			if (WeaponOnGround)
+			if (WeaponOnGround && !Cast<APlayerCharacter>(WeaponOnGround->GetAttachParentActor()))
 			{
-				WeaponOnGround->Highlight(true);
+				if (IsLocallyControlled()) {
+					WeaponOnGround->Highlight(true);
+				}
 			}
 		}
+	}
+	if (OtherComp->ComponentHasTag("KILLBARRIER")) {
+		DamageComponent->Damage(9999999999999);
 	}
 }
 
@@ -496,7 +502,15 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 		EquippedWeapon->AttachToComponent(characterMesh, AttachmentRules, "WeaponSocket");
 		EquippedWeapon->Equip();
 		EquippedWeapon->SetOwner(this);
-		OnEquipWeapon.Broadcast();
+		Multi_EquipWeapon(Weapon);
+	}
+}
+
+void APlayerCharacter::Multi_EquipWeapon_Implementation(AWeapon* Weapon)
+{
+	if (Weapon) {
+		Weapon->Highlight(false);
+		Weapon->OnAttack.AddDynamic(this, &APlayerCharacter::DoAttackVisuals);
 	}
 }
 
