@@ -462,9 +462,11 @@ void APlayerCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 		if (OtherActor != EquippedWeapon)
 		{
 			WeaponOnGround = Cast<AWeapon>(OtherActor);
-			if (WeaponOnGround)
+			if (WeaponOnGround && !Cast<APlayerCharacter>(WeaponOnGround->GetAttachParentActor()))
 			{
-				WeaponOnGround->Highlight(true);
+				if (IsLocallyControlled()) {
+					WeaponOnGround->Highlight(true);
+				}
 			}
 		}
 	}
@@ -502,6 +504,7 @@ void APlayerCharacter::Server_EquipWeapon_Implementation(AWeapon* Weapon)
 
 void APlayerCharacter::Multi_EquipWeapon_Implementation(AWeapon* Weapon)
 {
+	Weapon->Highlight(false);
 	Weapon->OnAttack.AddDynamic(this, &APlayerCharacter::DoAttackVisuals);
 }
 
