@@ -30,6 +30,7 @@ void AFuel::Server_DropObject_Implementation(FVector directionToLaunch, FVector 
 				if(fuelComp->IsInsideDeposit(GetActorLocation()))
 				{
 					fuelComp->Server_AddFuel(this);
+					GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("ADDFUEL"));
 				}
 			}
 		}

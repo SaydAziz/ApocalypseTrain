@@ -62,7 +62,7 @@ protected:
 	bool IsGameOverCountingDown();
 	void UpdateSpeed(float deltaTime);
 	void UpdateLocation(float DeltaTime);
-	void UpdateFuelComponent(float DeltaTime);
+	void UpdateFuelComp();
 
 	bool IsStopping();
 	UFUNCTION()
