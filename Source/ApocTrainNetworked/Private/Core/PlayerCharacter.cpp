@@ -101,6 +101,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("FacingWall: %d"), IsFacingWall()));
 
+	FString EnumValueAsString = UEnum::GetValueAsString(CurrentActionState);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString); 
+
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
 	{
@@ -228,10 +231,16 @@ void APlayerCharacter::Server_PickupItem_Implementation(ACarryableActor* itemToC
 	if (IsCarryingItem()) {
 		return;
 	}
-	SetPlayerActionState(EPlayerActionState::carrying);
-	carriedObject = itemToCarry;
 	itemToCarry->Server_OnPickedUp(characterMesh);
+	Multi_PickupItem(itemToCarry);
 	
+}
+
+void APlayerCharacter::Multi_PickupItem_Implementation(ACarryableActor* itemToCarry)
+{
+	SetPlayerActionState(EPlayerActionState::carrying);
+	EquippedWeapon->StopAttack();
+	carriedObject = itemToCarry;
 }
 
 
@@ -419,6 +428,7 @@ void APlayerCharacter::StopAction(const FInputActionValue& Value)
 void APlayerCharacter::StopAttacking()
 {
 	if (IsAttacking()) {
+
 		EquippedWeapon->StopAttack();
 		if (!IsCarryingItem()) {
 			SetPlayerActionState(EPlayerActionState::idle);

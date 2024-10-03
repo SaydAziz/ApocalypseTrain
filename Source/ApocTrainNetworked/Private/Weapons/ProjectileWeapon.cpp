@@ -27,6 +27,7 @@ void AProjectileWeapon::Tick(float DeltaTime)
 
 void AProjectileWeapon::StartAttack()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("STARTED ATTACKING")));
 	bIsHolding = true;
 	if (CurrentWeaponState != EProjectileWeaponState::shooting)
 	{
@@ -40,6 +41,7 @@ void AProjectileWeapon::StopAttack()
 {
 	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
 	bIsHolding = false;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("STOPPED ATTACKING")));
 }
 
 void AProjectileWeapon::Attack()
