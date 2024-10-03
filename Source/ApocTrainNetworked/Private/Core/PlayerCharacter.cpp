@@ -101,8 +101,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("FacingWall: %d"), IsFacingWall()));
 
-	FString EnumValueAsString = UEnum::GetValueAsString(CurrentActionState);
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString); 
+	//FString EnumValueAsString = UEnum::GetValueAsString(CurrentActionState);
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString); 
 
 	float CurrentSpeed = GetVelocity().Size();
 	if (CurrentSpeed > GetCharacterMovement()->MaxWalkSpeed)
