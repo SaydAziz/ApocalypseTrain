@@ -35,12 +35,13 @@ void ATrain::BeginPlay()
 void ATrain::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	/*FString EnumValueAsString = UEnum::GetValueAsString(currentTrainState);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString);*/
 	if (CanMove) {
 		UpdateSpeed(DeltaTime);
 		UpdateLocation(DeltaTime);
 	}
-	UpdateFuelComponent(DeltaTime);
+	UpdateFuelComp();
 	CheckGameState();
 }
 
@@ -53,12 +54,9 @@ void ATrain::CheckGameState()
 			}
 			break;
 		case EGameState::traveling:
-			if (IsTrainStopped() || IsStopping()) {
-				StartTrain();
-			}
 			break;
 		case EGameState::Encounter:
-			if (!IsStopping()) {
+			if (!IsStopping() && !IsTrainStopped()) {
 				StopTrain();
 			}
 			break;
@@ -112,7 +110,7 @@ void ATrain::UpdateLocation(float DeltaTime)
 	SetActorLocation(currentLocation, true);
 }
 
-void ATrain::UpdateFuelComponent(float DeltaTime)
+void ATrain::UpdateFuelComp()
 {
 	if (currentTrainState != ETrainState::stopped && currentTrainState != ETrainState::decelerating) {
 		fuelComponent->bBurning = false;
@@ -120,11 +118,13 @@ void ATrain::UpdateFuelComponent(float DeltaTime)
 	else {
 		fuelComponent->bBurning = true;
 	}
-	if (!fuelComponent->HasFuel()) {
-		SetTrainState(ETrainState::decelerating);
+	if (!fuelComponent->HasFuel() && currentTrainState == ETrainState::accelerating) {
+		StopTrain();
+	}
+	if (fuelComponent->HasFuel() && gameState->GetGameState() != EGameState::Encounter && currentTrainState != ETrainState::accelerating) {
+		StartTrain();
 	}
 }
-
 
 bool ATrain::IsStopping()
 {
@@ -134,16 +134,18 @@ bool ATrain::IsStopping()
 void ATrain::SetTrainState(ETrainState stateToSet)
 {
 	switch (stateToSet) {
-	case ETrainState::stopped:
-		NotifyTrainStop();
-		break;
-	case ETrainState::accelerating:
-		NotifyTrainStart();
-		break;
-	case ETrainState::decelerating:
-		break;
+		case ETrainState::stopped:
+			NotifyTrainStop();
+			break;
+		case ETrainState::accelerating:
+			NotifyTrainStart();
+			break;
+		case ETrainState::decelerating:
+			break;
 	}
 	currentTrainState = stateToSet;
+	FString EnumValueAsString = UEnum::GetValueAsString(currentTrainState);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString);
 }
 
 void ATrain::StartTrain()
@@ -182,7 +184,7 @@ float ATrain::GetMaxFuel()
 
 bool ATrain::IsGameOverCountingDown()
 {
-	return false;
+	return true;
 }
 
 FVector ATrain::GetTrainLocation()
