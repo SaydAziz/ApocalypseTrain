@@ -9,6 +9,7 @@ AProjectileWeapon::AProjectileWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bIsHolding = false;
 }
 
 void AProjectileWeapon::BeginPlay()
@@ -26,6 +27,7 @@ void AProjectileWeapon::Tick(float DeltaTime)
 
 void AProjectileWeapon::StartAttack()
 {
+	bIsHolding = true;
 	if (CurrentWeaponState != EProjectileWeaponState::shooting)
 	{
 		SetWeaponState(EProjectileWeaponState::shooting);
@@ -37,6 +39,7 @@ void AProjectileWeapon::StartAttack()
 void AProjectileWeapon::StopAttack()
 {
 	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
+	bIsHolding = false;
 }
 
 void AProjectileWeapon::Attack()
@@ -73,6 +76,7 @@ void AProjectileWeapon::Attack()
 				}
 			}
 		}
+		OnAttack.Broadcast();
 		Multicast_AttackEffects();
 	}
 }
@@ -83,12 +87,16 @@ void AProjectileWeapon::Multicast_AttackEffects_Implementation()
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, GetAttachParentActor()->GetActorForwardVector().Rotation());
 	}
-	OnAttack.Broadcast();
 }
 
 void AProjectileWeapon::ResetAttack()
 {
 	SetWeaponState(EProjectileWeaponState::idle);
+	if (bIsHolding == true)
+	{
+		StartAttack();
+	}
+
 }
 
 void AProjectileWeapon::Reload()
