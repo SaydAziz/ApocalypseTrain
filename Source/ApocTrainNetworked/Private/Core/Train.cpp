@@ -144,8 +144,6 @@ void ATrain::SetTrainState(ETrainState stateToSet)
 			break;
 	}
 	currentTrainState = stateToSet;
-	FString EnumValueAsString = UEnum::GetValueAsString(currentTrainState);
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, EnumValueAsString);
 }
 
 void ATrain::StartTrain()
