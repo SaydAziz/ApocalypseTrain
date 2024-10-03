@@ -230,6 +230,9 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void Server_PickupItem(class ACarryableActor* itemToCarry);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multi_PickupItem(ACarryableActor* itemToCarry);
+
 	UFUNCTION(Server, Reliable)
 	void Server_OnInteract(bool interacting);
 

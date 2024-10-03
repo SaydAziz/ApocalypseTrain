@@ -31,6 +31,8 @@ protected:
 
 	EProjectileWeaponState CurrentWeaponState;
 
+	bool bIsHolding;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float ReloadTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
