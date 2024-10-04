@@ -69,13 +69,14 @@ void AProjectileWeapon::Attack()
 		TraceParams->AddIgnoredActor(this);
 
 		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 15.0f);
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_WorldDynamic, *TraceParams))
 		{
 			if (HitResult.GetActor()) {
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
 				if (UDamageComponent* dmgComp = HitResult.GetActor()->GetComponentByClass<UDamageComponent>()) {
 					dmgComp->Damage(Data->Damage);
 				}
+				SpawnHitVFXType(HitResult);
 			}
 		}
 		OnAttack.Broadcast();
@@ -127,4 +128,13 @@ void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
 	}
 }
 
+void AProjectileWeapon::SpawnHitVFXType(FHitResult hit)
+{
+	FVector hitLocation = hit.Location;
+	FVector hitNormal = hit.Normal;
+	if (hit.GetActor()) {
+		FRotator Rotation = FRotationMatrix::MakeFromX(hitNormal).Rotator();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletHitVFX, hitLocation, Rotation);
+	}
+}
 

@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float Damage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	UNiagaraSystem* BulletTracer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	UNiagaraSystem* BulletHitVFX;
 };

@@ -38,6 +38,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	float ClipAmmoAmount;
 
+	void SpawnHitVFXType(FHitResult hit);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
