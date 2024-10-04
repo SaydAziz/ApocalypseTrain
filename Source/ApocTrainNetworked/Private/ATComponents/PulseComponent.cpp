@@ -30,6 +30,9 @@ void UPulseComponent::BeginPlay()
 		PulseTimeline->AddInterpFloat(FloatCurve, TimelineProgress);
 		PulseTimeline->SetLooping(false);
 		PulseTimeline->SetIgnoreTimeDilation(true);
+		FOnTimelineEvent TimelineFinishedCallback;
+		TimelineFinishedCallback.BindUFunction(this, FName("OnTimelineFinished"));
+		PulseTimeline->SetTimelineFinishedFunc(TimelineFinishedCallback);
 	}
 }
 
@@ -57,6 +60,11 @@ void UPulseComponent::HandleProgress(float Value)
 	}
 }
 
+void UPulseComponent::OnTimelineFinished()
+{
+	bIsPulsing = false;
+}
+
 // Called every frame
 void UPulseComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -67,7 +75,8 @@ void UPulseComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UPulseComponent::Pulse()
 {
-	if (PulseTimeline) {
+	if (PulseTimeline && !bIsPulsing) {
+		bIsPulsing = true;
 		PulseTimeline->PlayFromStart();
 	}
 }
