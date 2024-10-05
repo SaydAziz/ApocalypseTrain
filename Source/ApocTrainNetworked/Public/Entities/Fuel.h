@@ -15,7 +15,7 @@ class APOCTRAINNETWORKED_API AFuel : public ACarryableActor
 	GENERATED_BODY()
 public:
 
-
+	virtual void OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override; 
 
 	virtual void Server_DropObject_Implementation(FVector directionToLaunch, FVector DropperLocation) override;
 
@@ -31,4 +31,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void OnFuelDeposited();
+
+	void CheckForDeposit();
 };
