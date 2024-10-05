@@ -81,3 +81,16 @@ void UPulseComponent::Pulse()
 	}
 }
 
+void UPulseComponent::StopPulse()
+{
+	if (PulseTimeline) {
+		if (PulseTimeline->IsPlaying())
+		{
+			PulseTimeline->Stop();
+		}
+		for (int i = 0; i < pulseMeshes.Num(); i++) {
+			pulseMeshes[i]->SetRelativeScale3D(startingScales[i]);
+		}
+	}
+}
+
