@@ -98,18 +98,17 @@ void AProjectileWeapon::ResetAttack()
 	{
 		StartAttack();
 	}
-
 }
 
 void AProjectileWeapon::Reload()
 {
+
 }
 
 void AProjectileWeapon::Server_Attack_Implementation()
 {
 	Attack();
 }
-
 
 void AProjectileWeapon::Equip()
 {
@@ -122,7 +121,6 @@ void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
 	{
 		CurrentWeaponState = NewWeaponState;
 		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
-
 		//Add transition logic here
 	}
 }

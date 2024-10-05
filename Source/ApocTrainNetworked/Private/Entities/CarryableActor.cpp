@@ -21,6 +21,7 @@ void ACarryableActor::OnInteract(APlayerCharacter* player)
 {
 	if (!player->IsCarryingItem()) {
 		carriedState = ECarriedState::Carried;
+		pulseComponent->StopPulse();
 		player->Server_PickupItem(this);
 		LastCarryingPlayer = player;
 	}

@@ -44,4 +44,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Pulse();
+
+	void StopPulse();
 };
