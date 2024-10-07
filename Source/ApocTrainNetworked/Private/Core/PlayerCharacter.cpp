@@ -353,6 +353,7 @@ void APlayerCharacter::DespawnPlayer()
 		currentRespawnTime = respawnTime;
 		StopAttacking();
 		SetActorLocation(playerManager->GetPlayerDeathPos());
+		OnRespawnTimerUpdate.Broadcast(currentRespawnTime, true);
 		GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 	}
 }
@@ -362,14 +363,16 @@ void APlayerCharacter::RespawnPlayer()
 	if (HasAuthority()) {
 		currentRespawnTime -= 1;
 		if (currentRespawnTime > 0) {
+			OnRespawnTimerUpdate.Broadcast(currentRespawnTime, true);
 			GetWorld()->GetTimerManager().SetTimer(respawnTimerHandle, this, &APlayerCharacter::RespawnPlayer, 1, false);
 			return;
 		}
 		//if the respawn timer is fulfilled, then actually respawn the player here
 		else {
+			OnRespawnTimerUpdate.Broadcast(currentRespawnTime, false);
 			bIsDead = false;
 			DamageComponent->Reset();
-			SetActorLocation(playerManager->GetPlayerSpawnPoint());
+			SetActorLocation(playerManager->GetPlayerSpawnPoint(PlayerIndex));
 		}
 	}
 }

@@ -53,7 +53,8 @@ public:
 	APlayerCharacter* GetClosestPlayer(FVector location);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector GetPlayerSpawnPoint();
+	FVector GetPlayerSpawnPoint(int PlayerIndex);
 
 	bool IsOutOfBounds(FVector location);
+
 };

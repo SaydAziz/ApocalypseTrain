@@ -88,10 +88,10 @@ APlayerCharacter* APlayerManager::GetClosestPlayer(FVector location)
 	return closestPlayer;
 }
 
-FVector APlayerManager::GetPlayerSpawnPoint()
+FVector APlayerManager::GetPlayerSpawnPoint(int PlayerIndex)
 {
 	FVector pos = SpawnOffset; 
-	float x = FMath::RandRange(-500, 500);
+	float x = PlayerIndex * 100;
 	pos.X += x;
 	if(train)
 	{
