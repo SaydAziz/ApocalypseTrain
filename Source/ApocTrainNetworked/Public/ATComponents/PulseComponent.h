@@ -20,6 +20,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	bool bIsPulsing;
+
 	void GetMeshesToPulse();
 	TArray<UMeshComponent*> pulseMeshes;
 	TArray<FVector> startingScales;
@@ -32,6 +34,9 @@ protected:
 
 	UFUNCTION()
 	void HandleProgress(float Value);
+	
+	UFUNCTION()
+	void OnTimelineFinished();
 
 public:	
 	// Called every frame
@@ -39,4 +44,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Pulse();
+
+	void StopPulse();
 };

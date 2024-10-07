@@ -9,6 +9,7 @@ AProjectileWeapon::AProjectileWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bIsHolding = false;
 }
 
 void AProjectileWeapon::BeginPlay()
@@ -26,6 +27,8 @@ void AProjectileWeapon::Tick(float DeltaTime)
 
 void AProjectileWeapon::StartAttack()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("STARTED ATTACKING")));
+	bIsHolding = true;
 	if (CurrentWeaponState != EProjectileWeaponState::shooting)
 	{
 		SetWeaponState(EProjectileWeaponState::shooting);
@@ -37,6 +40,8 @@ void AProjectileWeapon::StartAttack()
 void AProjectileWeapon::StopAttack()
 {
 	GetWorldTimerManager().ClearTimer(AttackRateTimerHandle);
+	bIsHolding = false;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("STOPPED ATTACKING")));
 }
 
 void AProjectileWeapon::Attack()
@@ -73,6 +78,7 @@ void AProjectileWeapon::Attack()
 				}
 			}
 		}
+		OnAttack.Broadcast();
 		Multicast_AttackEffects();
 	}
 }
@@ -83,23 +89,26 @@ void AProjectileWeapon::Multicast_AttackEffects_Implementation()
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, GetAttachParentActor()->GetActorForwardVector().Rotation());
 	}
-	OnAttack.Broadcast();
 }
 
 void AProjectileWeapon::ResetAttack()
 {
 	SetWeaponState(EProjectileWeaponState::idle);
+	if (bIsHolding == true)
+	{
+		StartAttack();
+	}
 }
 
 void AProjectileWeapon::Reload()
 {
+
 }
 
 void AProjectileWeapon::Server_Attack_Implementation()
 {
 	Attack();
 }
-
 
 void AProjectileWeapon::Equip()
 {
@@ -112,7 +121,6 @@ void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
 	{
 		CurrentWeaponState = NewWeaponState;
 		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
-
 		//Add transition logic here
 	}
 }

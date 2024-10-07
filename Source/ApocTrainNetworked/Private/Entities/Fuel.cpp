@@ -15,25 +15,17 @@
 
 
 
+void AFuel::OnPhysicsComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::OnPhysicsComponentHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+	CheckForDeposit();
+}
+
 void AFuel::Server_DropObject_Implementation(FVector directionToLaunch, FVector DropperLocation)
 {
 	//this is bad - if player has not entered fuel box with fuel yet this will not work bc last overlap deposit is null need to find a new method
 	Super::Server_DropObject_Implementation(directionToLaunch, DropperLocation);
-	TArray<AActor*> OverlappingActors;
-	GetOverlappingActors(OverlappingActors);
-
-	for (AActor* Actor : OverlappingActors)
-	{
-		if (Actor) {
-			if (UFuelComponent* fuelComp = Actor->FindComponentByClass<UFuelComponent>())
-			{
-				if(fuelComp->IsInsideDeposit(GetActorLocation()))
-				{
-					fuelComp->Server_AddFuel(this);
-				}
-			}
-		}
-	}
+	CheckForDeposit();
 }
 
 void AFuel::BeginPlay()
@@ -59,4 +51,24 @@ void AFuel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 void AFuel::OnFuelDeposited()
 {
 
+}
+
+void AFuel::CheckForDeposit()
+{
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (Actor) {
+			if (UFuelComponent* fuelComp = Actor->FindComponentByClass<UFuelComponent>())
+			{
+				if (fuelComp->IsInsideDeposit(GetActorLocation()))
+				{
+					fuelComp->Server_AddFuel(this);
+					GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("ADDFUEL"));
+				}
+			}
+		}
+	}
 }
