@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "ATComponents/DamageComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraComponent.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -66,6 +67,17 @@ void AProjectileWeapon::Multicast_AttackEffects_Implementation()
 	if (Data->BulletTracer)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, GetAttachParentActor()->GetActorForwardVector().Rotation());
+	}
+	if (Data->MuzzleFlash) 
+	{
+		FVector Location = WeaponMesh->GetSocketLocation("FlashSocket");
+		FRotator Rotation = GetAttachParentActor()->GetActorForwardVector().Rotation();
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),Data->MuzzleFlash,Location,Rotation);
+		// Optionally, you can set custom parameters (like direction) on the spawned Niagara system
+		if (NiagaraComp)
+		{
+			NiagaraComp->SetVectorParameter(FName("CustomDirection"), GetAttachParentActor()->GetActorForwardVector());
+		}
 	}
 }
 

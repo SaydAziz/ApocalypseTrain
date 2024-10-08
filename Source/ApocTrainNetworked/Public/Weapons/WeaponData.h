@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	int ShotsPerAttack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	UNiagaraSystem* BulletTracer;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	UNiagaraSystem* MuzzleFlash;
 };
