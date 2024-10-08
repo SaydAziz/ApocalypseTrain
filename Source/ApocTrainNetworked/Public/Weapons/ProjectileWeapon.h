@@ -52,7 +52,7 @@ public:
 	virtual void Reload();
 
 	UFUNCTION(NetMulticast, Unreliable)
-	virtual void Multicast_AttackEffects();
+	virtual void Multicast_AttackEffects(FVector bulletDir);
 
 	virtual void Server_Attack_Implementation() override;
 

@@ -62,11 +62,11 @@ void AProjectileWeapon::Attack()
 	}
 }
 
-void AProjectileWeapon::Multicast_AttackEffects_Implementation() 
+void AProjectileWeapon::Multicast_AttackEffects_Implementation(FVector bulletDir)
 {
 	if (Data->BulletTracer)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, GetAttachParentActor()->GetActorForwardVector().Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, bulletDir.Rotation());
 	}
 	if (Data->MuzzleFlash) 
 	{
@@ -122,7 +122,7 @@ void AProjectileWeapon::ShootProjectile()
 	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
 	StartTrace += GetAttachParentActor()->GetActorRightVector() * 20.0f;
 	FVector ForwardVector = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(GetAttachParentActor()->GetActorForwardVector(), Data->RandomShotConeRadius);
-	FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
+	FVector EndTrace = ((ForwardVector * Data->Range) + StartTrace);
 
 	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
 
@@ -146,7 +146,7 @@ void AProjectileWeapon::ShootProjectile()
 		}
 	}
 	OnAttack.Broadcast();
-	Multicast_AttackEffects();
+	Multicast_AttackEffects(ForwardVector);
 }
 
 

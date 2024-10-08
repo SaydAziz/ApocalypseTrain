@@ -29,6 +29,9 @@ public:
 	float RandomShotConeRadius;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float Range;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	int ShotsPerAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
