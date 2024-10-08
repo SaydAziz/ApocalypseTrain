@@ -29,6 +29,8 @@ protected:
 
 	virtual void SetWeaponState(EProjectileWeaponState NewWeaponState);
 
+	void ShootProjectile();
+
 	EProjectileWeaponState CurrentWeaponState;
 
 	bool bIsHolding;
