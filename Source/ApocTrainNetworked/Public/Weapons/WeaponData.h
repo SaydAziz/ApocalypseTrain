@@ -23,5 +23,8 @@ public:
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float Penetration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	UNiagaraSystem* BulletTracer;
 };

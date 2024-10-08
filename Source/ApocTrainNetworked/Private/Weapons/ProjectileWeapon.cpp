@@ -68,13 +68,19 @@ void AProjectileWeapon::Attack()
 		TraceParams->AddIgnoredActor(GetAttachParentActor());
 		TraceParams->AddIgnoredActor(this);
 
-		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 15.0f);
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
-		{
-			if (HitResult.GetActor()) {
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
-				if (UDamageComponent* dmgComp = HitResult.GetActor()->GetComponentByClass<UDamageComponent>()) {
-					dmgComp->Damage(Data->Damage);
+		FCollisionObjectQueryParams objectParams;
+		objectParams.AddObjectTypesToQuery(ECC_Pawn);
+		objectParams.AddObjectTypesToQuery(ECC_Destructible);
+		TArray<FHitResult> hits;
+		if (GetWorld()->LineTraceMultiByObjectType(hits, StartTrace, EndTrace, objectParams, *TraceParams)) {
+			for (int i = 0; i < hits.Num(); i++) {
+				if (i >= Data->Penetration) {
+					break;
+				}
+				if (hits[i].GetActor()) {
+					if (UDamageComponent* dmgComp = hits[i].GetActor()->GetComponentByClass<UDamageComponent>()) {
+						dmgComp->Damage(Data->Damage);
+					}
 				}
 			}
 		}
