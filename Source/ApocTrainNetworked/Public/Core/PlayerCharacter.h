@@ -11,6 +11,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionStateChange, uint8, state);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRespawnTimerUpdate, int32, timeLeft, bool, visible);
 
 UENUM(BlueprintType)
 enum class EPlayerMovementState : uint8
@@ -76,6 +77,10 @@ public:
 	//PLAYER STATE
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnActionStateChange OnActionStateChange;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnRespawnTimerUpdate OnRespawnTimerUpdate;
+
 
 protected:
 
@@ -205,6 +210,9 @@ protected:
 public:	
 
 	bool IsDead();
+
+	UFUNCTION(BlueprintCallable, Blueprintpure)
+	float GetRespawnTime();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
