@@ -72,6 +72,11 @@ bool APlayerCharacter::IsDead()
 	return bIsDead;
 }
 
+float APlayerCharacter::GetRespawnTime()
+{
+	return respawnTime;
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {

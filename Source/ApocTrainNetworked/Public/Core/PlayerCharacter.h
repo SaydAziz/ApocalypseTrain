@@ -210,6 +210,9 @@ protected:
 public:	
 
 	bool IsDead();
+
+	UFUNCTION(BlueprintCallable, Blueprintpure)
+	float GetRespawnTime();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

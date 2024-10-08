@@ -90,17 +90,9 @@ APlayerCharacter* APlayerManager::GetClosestPlayer(FVector location)
 
 FVector APlayerManager::GetPlayerSpawnPoint(int PlayerIndex)
 {
-	//this is super messy and too many magic numbers. Should expose these offset numbers to BP with good name conventions
 	FVector pos = SpawnOffset; 
-	float x = -(PlayerIndex * 100);
-	pos.Y -= 400;
-	if (PlayerIndex % 2 == 0) {
-		pos.Y -= 200;
-	}
-	pos.Y -= 300;
+	float x = PlayerIndex * 100;
 	pos.X += x;
-	pos.X -= 100;
-	pos.Z += 100;
 	if(train)
 	{
 		pos.Y += train->GetActorLocation().Y;
