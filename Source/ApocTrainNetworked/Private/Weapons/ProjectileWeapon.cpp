@@ -4,6 +4,8 @@
 #include "Weapons/ProjectileWeapon.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ATComponents/DamageComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "NiagaraComponent.h"
 
 AProjectileWeapon::AProjectileWeapon()
 {
@@ -54,40 +56,28 @@ void AProjectileWeapon::Attack()
 	else
 	{
 		GetWorldTimerManager().SetTimer(CanAttackTimerHandle, this, &AProjectileWeapon::ResetAttack, Data->AttackRate, false);
-		FHitResult HitResult = FHitResult();
-
-		FVector StartTrace = GetAttachParentActor()->GetActorLocation();
-		StartTrace += GetAttachParentActor()->GetActorRightVector() * 20.0f;
-		FVector ForwardVector = GetAttachParentActor()->GetActorForwardVector();
-		//FVector StartTrace = GetActorLocation();
-		//FVector ForwardVector = GetActorForwardVector();
-		FVector EndTrace = ((ForwardVector * 6000.0f) + StartTrace);
-
-		FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
-
-		TraceParams->AddIgnoredActor(GetAttachParentActor());
-		TraceParams->AddIgnoredActor(this);
-
-		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor::Red, false, 15.0f);
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Pawn, *TraceParams))
-		{
-			if (HitResult.GetActor()) {
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
-				if (UDamageComponent* dmgComp = HitResult.GetActor()->GetComponentByClass<UDamageComponent>()) {
-					dmgComp->Damage(Data->Damage);
-				}
-			}
+		for (int i = 0; i < Data->ShotsPerAttack; i++) {
+			ShootProjectile();
 		}
-		OnAttack.Broadcast();
-		Multicast_AttackEffects();
 	}
 }
 
-void AProjectileWeapon::Multicast_AttackEffects_Implementation() 
+void AProjectileWeapon::Multicast_AttackEffects_Implementation(FVector bulletDir)
 {
 	if (Data->BulletTracer)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, GetAttachParentActor()->GetActorForwardVector().Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Data->BulletTracer, GetAttachParentActor()->GetActorLocation() + GetAttachParentActor()->GetActorRightVector() * 20.0f, bulletDir.Rotation());
+	}
+	if (Data->MuzzleFlash) 
+	{
+		FVector Location = WeaponMesh->GetSocketLocation("FlashSocket");
+		FRotator Rotation = GetAttachParentActor()->GetActorForwardVector().Rotation();
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),Data->MuzzleFlash,Location,Rotation);
+		// Optionally, you can set custom parameters (like direction) on the spawned Niagara system
+		if (NiagaraComp)
+		{
+			NiagaraComp->SetVectorParameter(FName("CustomDirection"), GetAttachParentActor()->GetActorForwardVector());
+		}
 	}
 }
 
@@ -123,6 +113,40 @@ void AProjectileWeapon::SetWeaponState(EProjectileWeaponState NewWeaponState)
 		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::Printf(TEXT("Switched to Weapon State: %d"), CurrentWeaponState));
 		//Add transition logic here
 	}
+}
+
+void AProjectileWeapon::ShootProjectile()
+{
+	FHitResult HitResult = FHitResult();
+
+	FVector StartTrace = GetAttachParentActor()->GetActorLocation();
+	StartTrace += GetAttachParentActor()->GetActorRightVector() * 20.0f;
+	FVector ForwardVector = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(GetAttachParentActor()->GetActorForwardVector(), Data->RandomShotConeRadius);
+	FVector EndTrace = ((ForwardVector * Data->Range) + StartTrace);
+
+	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
+
+	TraceParams->AddIgnoredActor(GetAttachParentActor());
+	TraceParams->AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams objectParams;
+	objectParams.AddObjectTypesToQuery(ECC_Pawn);
+	objectParams.AddObjectTypesToQuery(ECC_Destructible);
+	TArray<FHitResult> hits;
+	if (GetWorld()->LineTraceMultiByObjectType(hits, StartTrace, EndTrace, objectParams, *TraceParams)) {
+		for (int i = 0; i < hits.Num(); i++) {
+			if (i >= Data->Penetration) {
+				break;
+			}
+			if (hits[i].GetActor()) {
+				if (UDamageComponent* dmgComp = hits[i].GetActor()->GetComponentByClass<UDamageComponent>()) {
+					dmgComp->Damage(Data->Damage);
+				}
+			}
+		}
+	}
+	OnAttack.Broadcast();
+	Multicast_AttackEffects(ForwardVector);
 }
 
 

@@ -23,5 +23,20 @@ public:
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float Penetration;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float RandomShotConeRadius;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	float Range;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	int ShotsPerAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	UNiagaraSystem* BulletTracer;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	UNiagaraSystem* MuzzleFlash;
 };
