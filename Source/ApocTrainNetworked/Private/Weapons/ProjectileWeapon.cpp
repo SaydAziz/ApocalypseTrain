@@ -132,7 +132,10 @@ void AProjectileWeapon::ShootProjectile()
 	FCollisionObjectQueryParams objectParams;
 	objectParams.AddObjectTypesToQuery(ECC_Pawn);
 	objectParams.AddObjectTypesToQuery(ECC_Destructible);
+	objectParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	objectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 	TArray<FHitResult> hits;
+	//need to find a way to ignore zombie meshes but not ignore walls and stuff
 	if (GetWorld()->LineTraceMultiByObjectType(hits, StartTrace, EndTrace, objectParams, *TraceParams)) {
 		for (int i = 0; i < hits.Num(); i++) {
 			if (i >= Data->Penetration) {
