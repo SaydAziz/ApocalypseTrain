@@ -53,11 +53,18 @@ protected:
 
 	AEnemyAIController* AIController;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category ="Cosmetic")
+	//VFX
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category ="VFX")
 	UNiagaraComponent* BloodSplatComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
 	UNiagaraSystem* BloodSplatSystem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+	float DeathVFXScale = 1;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+	FVector DeathVFXPositionOffset = FVector(0,0,0);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UDamageComponent* DamageComponent;

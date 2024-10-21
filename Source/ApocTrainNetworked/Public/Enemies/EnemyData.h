@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "NiagaraSystem.h"
 #include "EnemyData.generated.h"
 
 /**
@@ -36,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	float SightRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	UNiagaraSystem* DeathVFX;
 
 	void IncreaseDifficulty();
 

@@ -125,6 +125,9 @@ void AEnemyCharacter::OnSpawn(FVector SpawnLocation)
 void AEnemyCharacter::OnDespawn()
 {
 	bIsDead = true;
+	if (EnemyData->DeathVFX) {
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), EnemyData->DeathVFX, GetActorLocation() + DeathVFXPositionOffset, GetActorForwardVector().Rotation(),FVector(DeathVFXScale, DeathVFXScale, DeathVFXScale));
+	}
 	DamageComponent->SetNegateDamageTrue();
 	if (AIController)
 		AIController->SetIsDead(bIsDead);
